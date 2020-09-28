@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <fragment
         android:id="@+id/ux_fragment"
@@ -20,5 +21,15 @@
         android:text="LSD Measure"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/fboRecord_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/surfaceview"
+        android:layout_alignTop="@+id/surfaceview"
+        android:onClick="onSavePicture"
+        android:text="Snap"
+        tools:ignore="OnClick"/>
 
 </FrameLayout>

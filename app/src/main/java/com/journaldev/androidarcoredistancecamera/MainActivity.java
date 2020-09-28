@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -173,14 +174,16 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 //            convertCm = Math.round((convertCm * 100000) / 100000.0);
             tvDistance.setText("Length Between Two Points : " + convertCm + " cm");
 
-
-
-            /*float[] distance_vector = firstAnchor.getPose().inverse()
-                    .compose(secondPose).getTranslation();
-            float totalDistanceSquared = 0;
-            for (int i = 0; i < 3; ++i)
-                totalDistanceSquared += distance_vector[i] * distance_vector[i];*/
         }
     }
 
+    public void onSavePicture(View view) {
+        //flag set here
+        //override render interface
+        //onSurfaceChanged, onDrawFrame
+        //need also saving bitmap logic
+        //https://stackoverflow.com/questions/48191513/how-to-take-picture-with-camera-using-arcore
+        float ab = 1;
+
+    }
 }
