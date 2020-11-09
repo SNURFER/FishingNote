@@ -195,9 +195,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             float dz = firstPose.tz() - secondPose.tz();
 
             ///Compute the straight-line distance.
-            float distanceMeters = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
-            float convertCm = distanceMeters * 100;
-//            convertCm = Math.round((convertCm * 100000) / 100000.0);
+            float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
+            float convertCm = (float) (Math.round(distanceCm * 100) / 100.0);
             tvDistance.setText("Length Between Two Points : " + convertCm + " cm");
 
         }
