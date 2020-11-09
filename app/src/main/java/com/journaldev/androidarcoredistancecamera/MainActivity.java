@@ -151,8 +151,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         MaterialFactory.makeTransparentWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
-                            Vector3 vector3 = new Vector3(0.05f, 0.01f, 0.01f);
-                            cubeRenderable = ShapeFactory.makeCube(vector3, Vector3.zero(), material);
+                            Vector3 vector3 = new Vector3(0.01f, 0.01f, 0.01f);
+                            float rad = (float) 0.005;
+                            cubeRenderable = ShapeFactory.makeSphere(rad, Vector3.zero(), material);
                             cubeRenderable.setShadowCaster(false);
                             cubeRenderable.setShadowReceiver(false);
                         });
