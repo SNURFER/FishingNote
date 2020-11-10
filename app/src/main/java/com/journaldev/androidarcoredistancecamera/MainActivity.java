@@ -1,9 +1,7 @@
 package com.journaldev.androidarcoredistancecamera;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -14,19 +12,21 @@ import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Pose;
 import com.google.ar.core.exceptions.NotYetAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
-import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
@@ -38,7 +38,6 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -52,14 +51,16 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private ArFragment arFragment;
-    private AnchorNode firstAnchorNode;
+    /*Views*/
+    private ArSceneView arSceneView;
     private TextView tvDistance;
+    private Button btnRecord;
+
+    /*PrivateMembers*/
+    private ArFragment arFragment;
     ModelRenderable cubeRenderable;
-    private Anchor firstAnchor = null;
-    private Anchor secondAnchor = null;
+    private AnchorNode firstAnchorNode;
     private AnchorNode secondAnchorNode;
-    private Image mCurrentImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,125 +71,106 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         }
 
         setContentView(R.layout.activity_main);
-
-        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
-        tvDistance = findViewById(R.id.tvDistance);
-
-        arFragment.getArSceneView().getScene().addOnUpdateListener((this::onSceneUpdate));
-
+        /*Permissions*/
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-
-
-        initModel();
-
-        arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
-            if (cubeRenderable == null)
-                return;
-
-            if (firstAnchor == null){
-                // Creating Anchor.
-                Anchor anchor = hitResult.createAnchor();
-                AnchorNode anchorNode = new AnchorNode(anchor);
-                anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                firstAnchor = anchor;
-                firstAnchorNode = anchorNode;
-
-
-                TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-                node.setRenderable(cubeRenderable);
-                node.setParent(anchorNode);
-                arFragment.getArSceneView().getScene().addOnUpdateListener(this);
-                arFragment.getArSceneView().getScene().addChild(anchorNode);
-                node.select();
-            }
-            else if (secondAnchor == null){
-                // Creating Anchor.
-                Anchor anchor = hitResult.createAnchor();
-                AnchorNode anchorNode = new AnchorNode(anchor);
-                anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                secondAnchor = anchor;
-                secondAnchorNode = anchorNode;
-
-
-                TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-                node.setRenderable(cubeRenderable);
-                node.setParent(anchorNode);
-                arFragment.getArSceneView().getScene().addOnUpdateListener(this);
-                arFragment.getArSceneView().getScene().addChild(anchorNode);
-                node.select();
-
-            }
-            else {
-                clearAnchor();
-
-            }
-
-        });
-
-
+        /*Init*/
+        Initialize();
+        getView();
+        setListeners();
     }
 
-    public boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
-
+    private boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         String openGlVersionString =
                 ((ActivityManager) Objects.requireNonNull(activity.getSystemService(Context.ACTIVITY_SERVICE)))
                         .getDeviceConfigurationInfo()
                         .getGlEsVersion();
         if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
             Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
-            Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
-                    .show();
+            toastMsg("Sceneform requires OpenGL ES 3.0 or later");
             activity.finish();
             return false;
         }
         return true;
     }
 
-    private void initModel() {
+    private void Initialize() {
         MaterialFactory.makeTransparentWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
-                            Vector3 vector3 = new Vector3(0.01f, 0.01f, 0.01f);
                             float rad = (float) 0.005;
                             cubeRenderable = ShapeFactory.makeSphere(rad, Vector3.zero(), material);
                             cubeRenderable.setShadowCaster(false);
                             cubeRenderable.setShadowReceiver(false);
                         });
+        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+    }
+
+    private void getView() {
+        arSceneView = arFragment.getArSceneView();
+        tvDistance = findViewById(R.id.tvDistance);
+        btnRecord = findViewById(R.id.btnRecord);
+    }
+
+    private void setListeners() {
+        arSceneView.getScene().addOnUpdateListener(this);
+
+        arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
+            if (cubeRenderable == null)
+                return;
+
+            if (firstAnchorNode == null) {
+                firstAnchorNode = CreateAnchorNode(hitResult);
+            }
+            else if (secondAnchorNode == null) {
+                secondAnchorNode = CreateAnchorNode(hitResult);
+            }
+            else {
+                clearAnchor();
+            }
+        });
+
+        btnRecord.setOnClickListener(v->{
+            try {
+                StoreImage(generateFilename());
+                toastMsg("saved image successfully");
+            } catch (IOException | NotYetAvailableException e) {
+                e.printStackTrace();
+                toastMsg("saved image failed");
+            }
+        });
+    }
+    private AnchorNode CreateAnchorNode(HitResult hitResult) {
+        Anchor anchor = hitResult.createAnchor();
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setParent(arSceneView.getScene());
+
+        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
+        node.setRenderable(cubeRenderable);
+        node.setParent(anchorNode);
+        arSceneView.getScene().addChild(anchorNode);
+        node.select();
+        return anchorNode;
     }
 
     private void clearAnchor() {
-        firstAnchor = null;
-        secondAnchor = null;
+        arFragment.getArSceneView().getScene().removeChild(firstAnchorNode);
+        firstAnchorNode.getAnchor().detach();
+        firstAnchorNode.setParent(null);
+        firstAnchorNode = null;
 
-
-        if (firstAnchorNode != null) {
-            arFragment.getArSceneView().getScene().removeChild(firstAnchorNode);
-            firstAnchorNode.getAnchor().detach();
-            firstAnchorNode.setParent(null);
-            firstAnchorNode = null;
-        }
-
-        if (secondAnchorNode != null) {
-            arFragment.getArSceneView().getScene().removeChild(secondAnchorNode);
-            secondAnchorNode.getAnchor().detach();
-            secondAnchorNode.setParent(null);
-            secondAnchorNode = null;
-        }
+        arFragment.getArSceneView().getScene().removeChild(secondAnchorNode);
+        secondAnchorNode.getAnchor().detach();
+        secondAnchorNode.setParent(null);
+        secondAnchorNode = null;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onUpdate(FrameTime frameTime) {
-        Frame frame = arFragment.getArSceneView().getArFrame();
-
-       // Log.d("API123", "onUpdateframe... current anchor node " + (firstAnchorNode == null));
-
-
-        if (firstAnchorNode != null && secondAnchorNode != null) {
-            Pose firstPose = firstAnchor.getPose();
-            Pose secondPose = secondAnchor.getPose();
+        if (IsDistanceMeasured()) {
+            Pose firstPose = firstAnchorNode.getAnchor().getPose();
+            Pose secondPose = secondAnchorNode.getAnchor().getPose();
 
             float dx = firstPose.tx() - secondPose.tx();
             float dy = firstPose.ty() - secondPose.ty();
@@ -198,45 +180,21 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
             float convertCm = (float) (Math.round(distanceCm * 100) / 100.0);
             tvDistance.setText("Length Between Two Points : " + convertCm + " cm");
-
         }
     }
 
-    public void onSavePicture(View view) {
-        //flag set here
-        //override render interface
-        //onSurfaceChanged, onDrawFrame
-        //need also saving bitmap logic
-        //https://stackoverflow.com/questions/48191513/how-to-take-picture-with-camera-using-arcore
-        float ab = 1;
-
-        try {
-            WriteImageInformation(mCurrentImage, generateFilename());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        toastMsg("saved image successfully");
-
+    private boolean IsDistanceMeasured() {
+        return firstAnchorNode != null && secondAnchorNode != null;
     }
-
-    private void onSceneUpdate(FrameTime frameTime) {
-        Frame currentFrame = arFragment.getArSceneView().getArFrame();
-        if (mCurrentImage != null) {
-            mCurrentImage.close();
-            mCurrentImage = null;
-        }
-        try {
-            mCurrentImage = currentFrame.acquireCameraImage();
-        } catch (NotYetAvailableException e) {
-            e.printStackTrace();
-        }
-        if (mCurrentImage != null) {
-            int imageFormat = mCurrentImage.getFormat();
-            if (imageFormat == ImageFormat.YUV_420_888) {
-                Log.d("ImageFormat", "Image format is YUV_420_888");
-            }
-        }
+    private void StoreImage(String path) throws IOException, NotYetAvailableException {
+        byte[] data;
+        Image image = arSceneView.getArFrame().acquireCameraImage();
+        data = NV21toJPEG(YUV_420_888toNV21(image),
+                image.getWidth(), image.getHeight());
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path));
+        bos.write(data);
+        bos.flush();
+        bos.close();
     }
 
     private static byte[] NV21toJPEG(byte[] nv21, int width, int height) {
@@ -244,16 +202,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
         yuv.compressToJpeg(new Rect(0, 0, width, height), 100, out);
         return out.toByteArray();
-    }
-
-    public static void WriteImageInformation(Image image, String path) throws IOException {
-        byte[] data = null;
-        data = NV21toJPEG(YUV_420_888toNV21(image),
-                image.getWidth(), image.getHeight());
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path));
-        bos.write(data);
-        bos.flush();
-        bos.close();
     }
 
     private static byte[] YUV_420_888toNV21(Image image) {
@@ -290,9 +238,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
     }
 
-    public void toastMsg(String msg) {
+    private void toastMsg(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
         toast.show();
     }
-
 }

@@ -18,17 +18,16 @@
         android:background="@android:color/black"
         android:gravity="center"
         android:padding="8dp"
-        android:text="LSD Measure"
+        android:text="FishNote"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/fboRecord_button"
+        android:id="@+id/btnRecord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/surfaceview"
         android:layout_alignTop="@+id/surfaceview"
-        android:onClick="onSavePicture"
         android:text="Snap"
         tools:ignore="OnClick"/>
 
