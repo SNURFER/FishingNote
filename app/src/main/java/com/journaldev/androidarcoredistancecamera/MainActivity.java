@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private ArSceneView arSceneView;
     private TextView tvDistance;
     private Button btnRecord;
+    private Button btnTest;
 
     /*PrivateMembers*/
     private ArFragment arFragment;
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         arSceneView = arFragment.getArSceneView();
         tvDistance = findViewById(R.id.tvDistance);
         btnRecord = findViewById(R.id.btnRecord);
+        btnTest = findViewById(R.id.btnTest);
     }
 
     private void setListeners() {
@@ -136,6 +139,11 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 e.printStackTrace();
                 toastMsg("saved image failed");
             }
+        });
+
+        btnTest.setOnClickListener(v->{
+            Intent intent = new Intent(this, TestActivity.class);
+            startActivity(intent);
         });
     }
     private AnchorNode CreateAnchorNode(HitResult hitResult) {
