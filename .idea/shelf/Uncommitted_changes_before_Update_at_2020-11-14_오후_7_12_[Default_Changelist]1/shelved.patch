@@ -1,0 +1,85 @@
+Index: app/src/main/res/layout/activity_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<FrameLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\">\r\n\r\n    <fragment\r\n        android:id=\"@+id/ux_fragment\"\r\n        android:name=\"com.google.ar.sceneform.ux.ArFragment\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\" />\r\n\r\n    <TextView\r\n        android:id=\"@+id/tvDistance\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_gravity=\"bottom\"\r\n        android:background=\"@android:color/black\"\r\n        android:gravity=\"center\"\r\n        android:padding=\"8dp\"\r\n        android:text=\"FishNote\"\r\n        android:textColor=\"@android:color/white\"\r\n        android:textSize=\"20sp\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/btnRecord\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_alignStart=\"@+id/surfaceview\"\r\n        android:layout_alignTop=\"@+id/surfaceview\"\r\n        android:text=\"Snap\"\r\n        tools:ignore=\"OnClick\"/>\r\n\r\n</FrameLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_main.xml	(revision 1e82f9ca32c581a3f613c6d10c3a2aeda9875e36)
++++ app/src/main/res/layout/activity_main.xml	(date 1605348522505)
+@@ -1,8 +1,10 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:id="@+id/frameLayout4"
+     android:layout_width="match_parent"
+-    android:layout_height="match_parent"
+-    xmlns:tools="http://schemas.android.com/tools">
++    android:layout_height="match_parent">
+ 
+     <fragment
+         android:id="@+id/ux_fragment"
+@@ -14,21 +16,29 @@
+         android:id="@+id/tvDistance"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+-        android:layout_gravity="bottom"
+         android:background="@android:color/black"
+         android:gravity="center"
+         android:padding="8dp"
+         android:text="FishNote"
+         android:textColor="@android:color/white"
+-        android:textSize="20sp" />
++        android:textSize="20sp"
++        app:layout_constraintBottom_toBottomOf="parent"
++        tools:layout_editor_absoluteX="1dp" />
+ 
+     <Button
+         android:id="@+id/btnRecord"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:layout_alignStart="@+id/surfaceview"
+-        android:layout_alignTop="@+id/surfaceview"
+         android:text="Snap"
+-        tools:ignore="OnClick"/>
++        app:layout_constraintLeft_toLeftOf="parent"
++        app:layout_constraintTop_toTopOf="parent" />
++
++    <Button
++        android:id="@+id/btnTest"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="Test"
++        app:layout_constraintRight_toRightOf="parent"
++        app:layout_constraintTop_toTopOf="parent" />
+ 
+-</FrameLayout>
+\ No newline at end of file
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    package=\"com.journaldev.androidarcoredistancecamera\">\r\n\r\n\r\n    <uses-permission android:name=\"android.permission.CAMERA\" />\r\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />\r\n    <uses-feature\r\n        android:name=\"android.hardware.camera.ar\"\r\n        android:required=\"true\" />\r\n\r\n    <application\r\n        android:allowBackup=\"true\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/AppTheme\"\r\n        android:requestLegacyExternalStorage=\"true\"\r\n        tools:ignore=\"GoogleAppIndexingWarning\">\r\n\r\n\r\n\r\n\r\n        <meta-data\r\n            android:name=\"com.google.ar.core\"\r\n            android:value=\"required\" />\r\n\r\n        <activity android:name=\".MainActivity\"\r\n            android:configChanges=\"orientation|screenSize\"\r\n            android:theme=\"@style/Theme.AppCompat.NoActionBar\"\r\n            android:screenOrientation=\"locked\"\r\n            android:exported=\"true\">\r\n\r\n\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n    </application>\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 1e82f9ca32c581a3f613c6d10c3a2aeda9875e36)
++++ app/src/main/AndroidManifest.xml	(date 1605347378326)
+@@ -34,11 +34,13 @@
+             android:exported="true">
+ 
+ 
++
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
++        <activity android:name=".TestActivity" />
+     </application>
+ 
+ </manifest>
+\ No newline at end of file

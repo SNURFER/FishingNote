@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="FishTypes">
+        <item>배스</item>
+        <item>돌돔</item>
+        <item>붉바리</item>
+        <item>참돔</item>
+    </string-array>
+</resources>
