@@ -45,7 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener {
+public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener, PixelCopy.OnPixelCopyFinishedListener {
 
 
     private static final double MIN_OPENGL_VERSION = 3.0;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     ModelRenderable cubeRenderable;
     private AnchorNode firstAnchorNode;
     private AnchorNode secondAnchorNode;
-    private ByteArrayOutputStream mPreviewImageStream;
+    private Bitmap mCapturedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,22 +132,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         });
 
         btnRecord.setOnClickListener(v->{
-            String path = generateFilename();
             try {
-                takeScreenshot(path);
-                SystemClock.sleep(1000);
+                takeScreenshotAndMoveToPreview();
             } catch (IOException | NotYetAvailableException e) {
                 e.printStackTrace();
                 toastMsg("saved image failed");
             }
-
-            toastMsg("saved image successfully");
-            Intent intent = new Intent(this, PreViewActivity.class);
-            byte[] byteArray = mPreviewImageStream.toByteArray();
-            intent.putExtra("image",byteArray);
-            startActivity(intent);
         });
-
     }
     private AnchorNode CreateAnchorNode(HitResult hitResult) {
         Anchor anchor = hitResult.createAnchor();
@@ -210,28 +201,35 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
     }
 
-    private void takeScreenshot(String path) throws IOException, NotYetAvailableException {
-        Bitmap captureBitmap = Bitmap.createBitmap(arSceneView.getWidth(), arSceneView.getHeight(), Bitmap.Config.ARGB_8888);
+    private void takeScreenshotAndMoveToPreview() throws IOException, NotYetAvailableException {
+        mCapturedBitmap = Bitmap.createBitmap(arSceneView.getWidth(), arSceneView.getHeight(), Bitmap.Config.ARGB_8888);
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
         handlerThread.start();
-        PixelCopy.request(arSceneView, captureBitmap, new PixelCopy.OnPixelCopyFinishedListener() {
-            @Override
-            public void onPixelCopyFinished(int copyResult) {
-                if (copyResult == PixelCopy.SUCCESS && captureBitmap != null) {
-                    try {
-                        FileOutputStream outputStream = new FileOutputStream(path);
-                        mPreviewImageStream= new ByteArrayOutputStream();
-                        captureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, mPreviewImageStream);
-                        mPreviewImageStream.writeTo(outputStream);
-                        outputStream.flush();
-                        outputStream.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                handlerThread.quitSafely();
+        PixelCopy.request(arSceneView, mCapturedBitmap, this,  new Handler(handlerThread.getLooper()));
+    }
+
+    @Override
+    public void onPixelCopyFinished(int copyResult) {
+        if (copyResult == PixelCopy.SUCCESS) {
+            try {
+                FileOutputStream outputStream = new FileOutputStream(generateFilename());
+                ByteArrayOutputStream previewImageStream = new ByteArrayOutputStream();
+                mCapturedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, previewImageStream);
+                previewImageStream.writeTo(outputStream);
+                outputStream.flush();
+                outputStream.close();
+                toastMsg("saved image successfully");
+
+                //move to preview activity
+                Intent intent = new Intent(this, PreViewActivity.class);
+                byte[] byteArray = previewImageStream.toByteArray();
+                intent.putExtra("image",byteArray);
+                startActivity(intent);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-        }, new Handler(handlerThread.getLooper()));
+        }
     }
 
     private void toastMsg(String msg) {
