@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     ModelRenderable cubeRenderable;
     private AnchorNode firstAnchorNode;
     private AnchorNode secondAnchorNode;
-    private ByteArrayOutputStream mCapturedImageByteArrayStrem;
+    private ByteArrayOutputStream mPreviewImageStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
             toastMsg("saved image successfully");
             Intent intent = new Intent(this, PreViewActivity.class);
-            byte[] byteArray = mCapturedImageByteArrayStrem.toByteArray();
+            byte[] byteArray = mPreviewImageStream.toByteArray();
             intent.putExtra("image",byteArray);
             startActivity(intent);
         });
@@ -220,9 +220,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 if (copyResult == PixelCopy.SUCCESS && captureBitmap != null) {
                     try {
                         FileOutputStream outputStream = new FileOutputStream(path);
-                        mCapturedImageByteArrayStrem = new ByteArrayOutputStream();
-                        captureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, mCapturedImageByteArrayStrem);
-                        mCapturedImageByteArrayStrem.writeTo(outputStream);
+                        mPreviewImageStream= new ByteArrayOutputStream();
+                        captureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, mPreviewImageStream);
+                        mPreviewImageStream.writeTo(outputStream);
                         outputStream.flush();
                         outputStream.close();
                     } catch (IOException ex) {
