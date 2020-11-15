@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.PixelCopy;
 import android.widget.Button;
@@ -54,13 +55,13 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private ArSceneView arSceneView;
     private TextView tvDistance;
     private Button btnRecord;
-    private Button btnTest;
 
     /*PrivateMembers*/
     private ArFragment arFragment;
     ModelRenderable cubeRenderable;
     private AnchorNode firstAnchorNode;
     private AnchorNode secondAnchorNode;
+    private ByteArrayOutputStream mPreviewImageStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         arSceneView = arFragment.getArSceneView();
         tvDistance = findViewById(R.id.tvDistance);
         btnRecord = findViewById(R.id.btnRecord);
-        btnTest = findViewById(R.id.btnTest);
     }
 
     private void setListeners() {
@@ -132,19 +132,22 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         });
 
         btnRecord.setOnClickListener(v->{
+            String path = generateFilename();
             try {
-                takeScreenshot(generateFilename());
-                toastMsg("saved image successfully");
+                takeScreenshot(path);
+                SystemClock.sleep(1000);
             } catch (IOException | NotYetAvailableException e) {
                 e.printStackTrace();
                 toastMsg("saved image failed");
             }
-        });
 
-        btnTest.setOnClickListener(v->{
-            Intent intent = new Intent(this, TestActivity.class);
+            toastMsg("saved image successfully");
+            Intent intent = new Intent(this, PreViewActivity.class);
+            byte[] byteArray = mPreviewImageStream.toByteArray();
+            intent.putExtra("image",byteArray);
             startActivity(intent);
         });
+
     }
     private AnchorNode CreateAnchorNode(HitResult hitResult) {
         Anchor anchor = hitResult.createAnchor();
@@ -217,9 +220,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 if (copyResult == PixelCopy.SUCCESS && captureBitmap != null) {
                     try {
                         FileOutputStream outputStream = new FileOutputStream(path);
-                        ByteArrayOutputStream outputData = new ByteArrayOutputStream();
-                        captureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputData);
-                        outputData.writeTo(outputStream);
+                        mPreviewImageStream= new ByteArrayOutputStream();
+                        captureBitmap.compress(Bitmap.CompressFormat.JPEG, 90, mPreviewImageStream);
+                        mPreviewImageStream.writeTo(outputStream);
                         outputStream.flush();
                         outputStream.close();
                     } catch (IOException ex) {
