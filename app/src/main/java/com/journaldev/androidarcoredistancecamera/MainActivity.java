@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private AnchorNode firstAnchorNode;
     private AnchorNode secondAnchorNode;
     private Bitmap mCapturedBitmap;
+    private float fish_size = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,11 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
         btnRecord.setOnClickListener(v->{
             try {
-                takeScreenshotAndMoveToPreview();
+                if (/*IsDistanceMeasured()*/ true) {
+                    takeScreenshotAndMoveToPreview();
+                } else {
+                    toastMsg("Measurement must proceed");
+                }
             } catch (IOException | NotYetAvailableException e) {
                 e.printStackTrace();
                 toastMsg("saved image failed");
@@ -178,8 +183,11 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
             ///Compute the straight-line distance.
             float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
-            float convertCm = (float) (Math.round(distanceCm * 100) / 100.0);
-            tvDistance.setText("Length Between Two Points : " + convertCm + " cm");
+            fish_size = (float) (Math.round(distanceCm * 100) / 100.0);
+
+            tvDistance.setText("Length Between Two Points : " + fish_size + " cm");
+        } else {
+            tvDistance.setText("FishNote");
         }
     }
 
@@ -224,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 Intent intent = new Intent(this, PreViewActivity.class);
                 byte[] byteArray = previewImageStream.toByteArray();
                 intent.putExtra("image",byteArray);
+                intent.putExtra("fish_size", fish_size);
                 startActivity(intent);
 
             } catch (IOException ex) {

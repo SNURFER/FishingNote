@@ -28,11 +28,14 @@ public class DbHandler {
 
     public void InsertInToFishInfo(int user_id, String name, float size, byte[] image) {
         SQLiteStatement insert_query = this.database.compileStatement("INSERT INTO FISH_INFO " +
-                "VALUES (?, ?, ?, ?);");
+                "VALUES (?, ?, ?, ?, ?, ?, ?);");
         insert_query.bindDouble(1, user_id);
         insert_query.bindString(2, name);
         insert_query.bindDouble(3, size);
-        insert_query.bindBlob(3, image);
+        insert_query.bindBlob(4, image);
+        insert_query.bindDouble(5, 0);
+        insert_query.bindDouble(6, 0);
+        insert_query.bindDouble(7, 0);
         insert_query.executeInsert();
     }
 
@@ -55,7 +58,7 @@ public class DbHandler {
     //Private methods
     private void CreateTables() {
         String create_fish_info = "CREATE TABLE IF NOT EXISTS FISH_INFO (user_id INTEGER, " +
-                " name TEXT, size REAL, image BLOB);";
+                " name TEXT, size REAL, image BLOB, date TEXT, altitude REAL, latitude REAL);";
         this.database.execSQL(create_fish_info);
     }
 
