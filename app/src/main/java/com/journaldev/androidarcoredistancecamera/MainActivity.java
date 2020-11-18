@@ -29,7 +29,9 @@ import com.google.ar.core.exceptions.NotYetAvailableException;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
+import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
+import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private AnchorNode m_firstAnchorNode;
     private AnchorNode m_secondAnchorNode;
     private Bitmap m_capturedBitmap;
+    private Node m_nodeForLine;
     private float m_fishSize = 0;
 
     @Override
@@ -191,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
 
             m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
+            drawLine(m_firstAnchorNode, m_secondAnchorNode);
+
         } else {
             m_tvDistance.setText("FishNote");
         }
@@ -262,5 +267,34 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private void toastMsg(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    private void drawLine(AnchorNode firstNode, AnchorNode secondNode) {
+        Vector3 firstPoint, secondPoint;
+        firstPoint = firstNode.getWorldPosition();
+        secondPoint = secondNode.getWorldPosition();
+
+        final Vector3 diffVec = Vector3.subtract(firstPoint, secondPoint);
+        final Quaternion rotationFromAToB = Quaternion.lookRotation(diffVec, Vector3.up());
+        //calculating vector rotation
+        MaterialFactory.makeOpaqueWithColor(getApplicationContext(),
+                new Color(android.graphics.Color.RED))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable model = ShapeFactory.makeCube(
+                                    new Vector3(.005f, .005f, diffVec.length()),
+                                    Vector3.zero(), material);
+                            //length with diffVec
+                            Anchor lineAnchor = secondNode.getAnchor();
+                            m_nodeForLine = new Node();
+                            m_nodeForLine.setParent(firstNode);
+                            m_nodeForLine.setRenderable(model);
+                            m_nodeForLine.setWorldPosition(
+                                    Vector3.add(firstPoint, secondPoint).scaled(.5f));
+                            //set position to middle point
+                            m_nodeForLine.setWorldRotation(rotationFromAToB);
+                            //set rotation
+                        }
+                );
     }
 }
