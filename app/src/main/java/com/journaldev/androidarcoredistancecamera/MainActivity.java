@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.PixelCopy;
 import android.widget.Button;
@@ -47,31 +46,33 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener, PixelCopy.OnPixelCopyFinishedListener {
+public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener,
+        PixelCopy.OnPixelCopyFinishedListener {
 
 
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
     /*Views*/
-    private ArSceneView arSceneView;
-    private TextView tvDistance;
-    private Button btnRecord;
+    private ArSceneView m_arSceneView;
+    private TextView m_tvDistance;
+    private Button m_btnRecord;
 
     /*PrivateMembers*/
-    private ArFragment arFragment;
-    ModelRenderable cubeRenderable;
-    private AnchorNode firstAnchorNode;
-    private AnchorNode secondAnchorNode;
-    private Bitmap mCapturedBitmap;
-    private float fish_size = 0;
+    private ArFragment m_arFragment;
+    ModelRenderable m_cubeRenderable;
+    private AnchorNode m_firstAnchorNode;
+    private AnchorNode m_secondAnchorNode;
+    private Bitmap m_capturedBitmap;
+    private float m_fishSize = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (!checkIsSupportedDeviceOrFinish(this)) {
-            Toast.makeText(getApplicationContext(), "Device not supported", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Device not supported",
+                    Toast.LENGTH_LONG).show();
         }
 
         setContentView(R.layout.activity_main);
@@ -79,14 +80,15 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
         /*Init*/
-        Initialize();
+        initialize();
         getView();
         setListeners();
     }
 
     private boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         String openGlVersionString =
-                ((ActivityManager) Objects.requireNonNull(activity.getSystemService(Context.ACTIVITY_SERVICE)))
+                ((ActivityManager) Objects.requireNonNull(
+                        activity.getSystemService(Context.ACTIVITY_SERVICE)))
                         .getDeviceConfigurationInfo()
                         .getGlEsVersion();
         if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
@@ -98,86 +100,88 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         return true;
     }
 
-    private void Initialize() {
-        MaterialFactory.makeTransparentWithColor(this, new Color(android.graphics.Color.RED))
+    private void initialize() {
+        MaterialFactory.makeTransparentWithColor(this,
+                new Color(android.graphics.Color.RED))
                 .thenAccept(
                         material -> {
                             float rad = (float) 0.005;
-                            cubeRenderable = ShapeFactory.makeSphere(rad, Vector3.zero(), material);
-                            cubeRenderable.setShadowCaster(false);
-                            cubeRenderable.setShadowReceiver(false);
+                            m_cubeRenderable = ShapeFactory.makeSphere(rad,
+                                    Vector3.zero(), material);
+                            m_cubeRenderable.setShadowCaster(false);
+                            m_cubeRenderable.setShadowReceiver(false);
                         });
-        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+        m_arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
     }
 
     private void getView() {
-        arSceneView = arFragment.getArSceneView();
-        tvDistance = findViewById(R.id.tvDistance);
-        btnRecord = findViewById(R.id.btnRecord);
+        m_arSceneView = m_arFragment.getArSceneView();
+        m_tvDistance = findViewById(R.id.tvDistance);
+        m_btnRecord = findViewById(R.id.btnRecord);
     }
 
     private void setListeners() {
-        arSceneView.getScene().addOnUpdateListener(this);
+        m_arSceneView.getScene().addOnUpdateListener(this);
 
-        arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
-            if (cubeRenderable == null)
+        m_arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
+            if (m_cubeRenderable == null)
                 return;
 
-            if (firstAnchorNode == null) {
-                firstAnchorNode = CreateAnchorNode(hitResult);
+            if (m_firstAnchorNode == null) {
+                m_firstAnchorNode = createAnchorNode(hitResult);
             }
-            else if (secondAnchorNode == null) {
-                secondAnchorNode = CreateAnchorNode(hitResult);
+            else if (m_secondAnchorNode == null) {
+                m_secondAnchorNode = createAnchorNode(hitResult);
             }
             else {
                 clearAnchor();
             }
         });
 
-        btnRecord.setOnClickListener(v->{
+        m_btnRecord.setOnClickListener(v->{
             try {
                 if (/*IsDistanceMeasured()*/ true) {
                     takeScreenshotAndMoveToPreview();
                 } else {
                     toastMsg("Measurement must proceed");
                 }
-            } catch (IOException | NotYetAvailableException e) {
+            } catch (NotYetAvailableException e) {
                 e.printStackTrace();
                 toastMsg("saved image failed");
             }
         });
     }
-    private AnchorNode CreateAnchorNode(HitResult hitResult) {
+    private AnchorNode createAnchorNode(HitResult hitResult) {
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setParent(arSceneView.getScene());
+        anchorNode.setParent(m_arSceneView.getScene());
 
-        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-        node.setRenderable(cubeRenderable);
+        TransformableNode node = new TransformableNode(m_arFragment.getTransformationSystem());
+        node.setRenderable(m_cubeRenderable);
         node.setParent(anchorNode);
-        arSceneView.getScene().addChild(anchorNode);
+        m_arSceneView.getScene().addChild(anchorNode);
         node.select();
         return anchorNode;
     }
 
     private void clearAnchor() {
-        arFragment.getArSceneView().getScene().removeChild(firstAnchorNode);
-        firstAnchorNode.getAnchor().detach();
-        firstAnchorNode.setParent(null);
-        firstAnchorNode = null;
+        m_arFragment.getArSceneView().getScene().removeChild(m_firstAnchorNode);
+        m_firstAnchorNode.getAnchor().detach();
+        m_firstAnchorNode.setParent(null);
+        m_firstAnchorNode = null;
 
-        arFragment.getArSceneView().getScene().removeChild(secondAnchorNode);
-        secondAnchorNode.getAnchor().detach();
-        secondAnchorNode.setParent(null);
-        secondAnchorNode = null;
+        m_arFragment.getArSceneView().getScene().removeChild(m_secondAnchorNode);
+        m_secondAnchorNode.getAnchor().detach();
+        m_secondAnchorNode.setParent(null);
+        m_secondAnchorNode = null;
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onUpdate(FrameTime frameTime) {
         if (IsDistanceMeasured()) {
-            Pose firstPose = firstAnchorNode.getAnchor().getPose();
-            Pose secondPose = secondAnchorNode.getAnchor().getPose();
+            Pose firstPose = m_firstAnchorNode.getAnchor().getPose();
+            Pose secondPose = m_secondAnchorNode.getAnchor().getPose();
 
             float dx = firstPose.tx() - secondPose.tx();
             float dy = firstPose.ty() - secondPose.ty();
@@ -185,37 +189,41 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
 
             ///Compute the straight-line distance.
             float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
-            fish_size = (float) (Math.round(distanceCm * 100) / 100.0);
+            m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
 
-            tvDistance.setText("Length Between Two Points : " + fish_size + " cm");
+            m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
         } else {
-            tvDistance.setText("FishNote");
+            m_tvDistance.setText("FishNote");
         }
     }
 
     private boolean IsDistanceMeasured() {
-        return firstAnchorNode != null && secondAnchorNode != null;
+        return m_firstAnchorNode != null && m_secondAnchorNode != null;
     }
 
     private String generateFilename() {
-        String date =
-                new SimpleDateFormat("yyyyMMddHHmmss", java.util.Locale.getDefault()).format(new Date());
+        String date = new SimpleDateFormat("yyyyMMddHHmmss",
+                        java.util.Locale.getDefault()).format(new Date());
 
-        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/");
+        File directory = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/");
         if (!directory.exists()) {
             boolean retVal = directory.mkdirs();
             Log.d("generateFileName", "directory... " + (retVal));
         }
 
         return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" + date + "_screenshot.jpg";
+                Environment.DIRECTORY_PICTURES) + File.separator + "Sceneform/" +
+                date + "_screenshot.jpg";
     }
 
-    private void takeScreenshotAndMoveToPreview() throws IOException, NotYetAvailableException {
-        mCapturedBitmap = Bitmap.createBitmap(arSceneView.getWidth(), arSceneView.getHeight(), Bitmap.Config.ARGB_8888);
+    private void takeScreenshotAndMoveToPreview() throws NotYetAvailableException {
+        m_capturedBitmap = Bitmap.createBitmap(m_arSceneView.getWidth(), m_arSceneView.getHeight(),
+                Bitmap.Config.ARGB_8888);
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
         handlerThread.start();
-        PixelCopy.request(arSceneView, mCapturedBitmap, this,  new Handler(handlerThread.getLooper()));
+        PixelCopy.request(m_arSceneView, m_capturedBitmap, this,
+                new Handler(handlerThread.getLooper()));
     }
 
     @Override
@@ -225,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             try {
                 FileOutputStream outputStream = new FileOutputStream(path);
                 ByteArrayOutputStream previewImageStream = new ByteArrayOutputStream();
-                mCapturedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, previewImageStream);
+                m_capturedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, previewImageStream);
                 previewImageStream.writeTo(outputStream);
                 outputStream.flush();
                 outputStream.close();
@@ -237,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 Intent intent = new Intent(this, PreViewActivity.class);
                 byte[] byteArray = previewImageStream.toByteArray();
                 intent.putExtra("image",byteArray);
-                intent.putExtra("fish_size", fish_size);
+                intent.putExtra("fish_size", m_fishSize);
                 startActivity(intent);
 
             } catch (IOException ex) {
@@ -249,12 +257,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private void registerToGallery(String path) {
         MediaScannerConnection.scanFile(this,
                 new String[] { path }, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    @Override
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("TAG", "Finished scanning " + path);
-                    }
-                });
+                (path1, uri) -> Log.i("TAG", "Finished scanning " + path1));
     }
 
     private void toastMsg(String msg) {
