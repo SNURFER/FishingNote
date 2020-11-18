@@ -6,16 +6,16 @@ import android.os.Bundle;
 import android.widget.Button;
 
 public class TestActivity extends Activity {
-    private Button btnGoBack;
+    private Button m_btnGoBack;
 
     @Override
     protected void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        btnGoBack = findViewById(R.id.btnGoBack);
+        m_btnGoBack = findViewById(R.id.btnGoBack);
 
         /*Set listener*/
-        btnGoBack.setOnClickListener(v->{
+        m_btnGoBack.setOnClickListener(v->{
             Intent intent = new Intent(this, PreViewActivity.class);
             startActivity(intent);
             finish();
