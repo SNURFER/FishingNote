@@ -7,6 +7,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -219,13 +221,16 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     @Override
     public void onPixelCopyFinished(int copyResult) {
         if (copyResult == PixelCopy.SUCCESS) {
+            String path = generateFilename();
             try {
-                FileOutputStream outputStream = new FileOutputStream(generateFilename());
+                FileOutputStream outputStream = new FileOutputStream(path);
                 ByteArrayOutputStream previewImageStream = new ByteArrayOutputStream();
                 mCapturedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, previewImageStream);
                 previewImageStream.writeTo(outputStream);
                 outputStream.flush();
                 outputStream.close();
+
+                registerToGallery(path);
                 toastMsg("saved image successfully");
 
                 //move to preview activity
@@ -239,6 +244,17 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 ex.printStackTrace();
             }
         }
+    }
+
+    private void registerToGallery(String path) {
+        MediaScannerConnection.scanFile(this,
+                new String[] { path }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("TAG", "Finished scanning " + path);
+                    }
+                });
     }
 
     private void toastMsg(String msg) {
