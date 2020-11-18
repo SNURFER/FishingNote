@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         m_arSceneView = m_arFragment.getArSceneView();
         m_tvDistance = findViewById(R.id.tvDistance);
         m_btnRecord = findViewById(R.id.btnRecord);
+        m_btnRecord.setEnabled(false);
     }
 
     private void setListeners() {
@@ -132,19 +133,17 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             }
             else if (m_secondAnchorNode == null) {
                 m_secondAnchorNode = createAnchorNode(hitResult);
+                m_btnRecord.setEnabled(true);
             }
             else {
                 clearAnchor();
+                m_btnRecord.setEnabled(false);
             }
         });
 
         m_btnRecord.setOnClickListener(v->{
             try {
-                if (/*IsDistanceMeasured()*/ true) {
-                    takeScreenshotAndMoveToPreview();
-                } else {
-                    toastMsg("Measurement must proceed");
-                }
+                takeScreenshotAndMoveToPreview();
             } catch (NotYetAvailableException e) {
                 e.printStackTrace();
                 toastMsg("saved image failed");
