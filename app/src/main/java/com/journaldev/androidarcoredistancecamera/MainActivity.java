@@ -176,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         m_secondAnchorNode.getAnchor().detach();
         m_secondAnchorNode.setParent(null);
         m_secondAnchorNode = null;
+
+        m_nodeForLine = null;
     }
 
     @SuppressLint("SetTextI18n")
