@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
 
             m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
-            drawLine(m_firstAnchorNode, m_secondAnchorNode);
+            drawLine();
 
         } else {
             m_tvDistance.setText("FishNote");
@@ -271,10 +271,10 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         toast.show();
     }
 
-    private void drawLine(AnchorNode firstNode, AnchorNode secondNode) {
+    private void drawLine() {
         Vector3 firstPoint, secondPoint;
-        firstPoint = firstNode.getWorldPosition();
-        secondPoint = secondNode.getWorldPosition();
+        firstPoint = m_firstAnchorNode.getWorldPosition();
+        secondPoint = m_secondAnchorNode.getWorldPosition();
 
         final Vector3 diffVec = Vector3.subtract(firstPoint, secondPoint);
         final Quaternion rotationFromAToB = Quaternion.lookRotation(diffVec, Vector3.up());
@@ -287,9 +287,9 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                                     new Vector3(.005f, .005f, diffVec.length()),
                                     Vector3.zero(), material);
                             //length with diffVec
-                            Anchor lineAnchor = secondNode.getAnchor();
+                            Anchor lineAnchor = m_secondAnchorNode.getAnchor();
                             m_nodeForLine = new Node();
-                            m_nodeForLine.setParent(firstNode);
+                            m_nodeForLine.setParent(m_firstAnchorNode);
                             m_nodeForLine.setRenderable(model);
                             m_nodeForLine.setWorldPosition(
                                     Vector3.add(firstPoint, secondPoint).scaled(.5f));
