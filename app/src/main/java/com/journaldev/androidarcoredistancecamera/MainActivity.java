@@ -49,7 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener,
+public class MainActivity extends AppCompatActivity implements
         PixelCopy.OnPixelCopyFinishedListener {
 
 
@@ -128,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     }
 
     private void setListeners() {
-        m_arSceneView.getScene().addOnUpdateListener(this);
-
         m_arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
             if (m_cubeRenderable == null)
                 return;
@@ -139,11 +137,10 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             }
             else if (m_secondAnchorNode == null) {
                 m_secondAnchorNode = createAnchorNode(hitResult);
-                m_btnRecord.setEnabled(true);
+                onDistanceMeasured();
             }
             else {
-                clearAnchor();
-                m_btnRecord.setEnabled(false);
+                resetScene();
             }
         });
 
@@ -169,6 +166,12 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         return anchorNode;
     }
 
+    private void resetScene() {
+        m_btnRecord.setEnabled(false);
+        m_tvDistance.setText("FishNote");
+        clearAnchor();
+    }
+
     private void clearAnchor() {
         m_arFragment.getArSceneView().getScene().removeChild(m_firstAnchorNode);
         m_firstAnchorNode.getAnchor().detach();
@@ -180,35 +183,26 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         m_secondAnchorNode.setParent(null);
         m_secondAnchorNode = null;
 
-        m_nodeForLine = null;
         m_nodeForLine.setParent(null);
+        m_nodeForLine = null;
     }
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onUpdate(FrameTime frameTime) {
-        if (IsDistanceMeasured()) {
-            Pose firstPose = m_firstAnchorNode.getAnchor().getPose();
-            Pose secondPose = m_secondAnchorNode.getAnchor().getPose();
+    private void onDistanceMeasured() {
+        m_btnRecord.setEnabled(true);
 
-            float dx = firstPose.tx() - secondPose.tx();
-            float dy = firstPose.ty() - secondPose.ty();
-            float dz = firstPose.tz() - secondPose.tz();
+        Pose firstPose = m_firstAnchorNode.getAnchor().getPose();
+        Pose secondPose = m_secondAnchorNode.getAnchor().getPose();
 
-            ///Compute the straight-line distance.
-            float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
-            m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
+        float dx = firstPose.tx() - secondPose.tx();
+        float dy = firstPose.ty() - secondPose.ty();
+        float dz = firstPose.tz() - secondPose.tz();
 
-            m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
-            drawLine();
+        ///Compute the straight-line distance.
+        float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
+        m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
 
-        } else {
-            m_tvDistance.setText("FishNote");
-        }
-    }
-
-    private boolean IsDistanceMeasured() {
-        return m_firstAnchorNode != null && m_secondAnchorNode != null;
+        m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
+        drawLine();
     }
 
     private String generateFilename() {
