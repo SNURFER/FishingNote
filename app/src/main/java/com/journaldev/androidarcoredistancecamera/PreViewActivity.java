@@ -66,10 +66,10 @@ public class PreViewActivity extends Activity {
                             m_intent.getByteArrayExtra("image"));
                     m_isSaved = true;
                 } else {
-                    toastMsg("Must choose fish type");
+                    Util.toastMsg(this, "Must choose fish type");
                 }
             } else {
-                   toastMsg("Already Saved");
+                   Util.toastMsg(this, "Already Saved");
             }
         });
 
@@ -124,10 +124,5 @@ public class PreViewActivity extends Activity {
     private void setPreviewImage (byte[] bytes) {
         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         m_ivPreviewImage.setImageBitmap(image);
-    }
-
-    private void toastMsg(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
-        toast.show();
     }
 }

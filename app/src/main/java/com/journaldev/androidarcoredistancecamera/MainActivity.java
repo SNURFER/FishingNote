@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -48,7 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements Scene.OnUpdateListener,
+public class MainActivity extends AppCompatActivity implements
         PixelCopy.OnPixelCopyFinishedListener {
 
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private Bitmap m_capturedBitmap;
     private Node m_nodeForLine;
     private float m_fishSize = 0;
+    private ProgressDialog m_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                         .getGlEsVersion();
         if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
             Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
-            toastMsg("Sceneform requires OpenGL ES 3.0 or later");
+            Util.toastMsg(this, "Sceneform requires OpenGL ES 3.0 or later");
             activity.finish();
             return false;
         }
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                             m_cubeRenderable.setShadowReceiver(false);
                         });
         m_arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+        m_dialog = new ProgressDialog(this);
     }
 
     private void getView() {
@@ -125,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     }
 
     private void setListeners() {
-        m_arSceneView.getScene().addOnUpdateListener(this);
-
         m_arFragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
             if (m_cubeRenderable == null)
                 return;
@@ -136,11 +137,10 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
             }
             else if (m_secondAnchorNode == null) {
                 m_secondAnchorNode = createAnchorNode(hitResult);
-                m_btnRecord.setEnabled(true);
+                onDistanceMeasured();
             }
             else {
-                clearAnchor();
-                m_btnRecord.setEnabled(false);
+                resetScene();
             }
         });
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 takeScreenshotAndMoveToPreview();
             } catch (NotYetAvailableException e) {
                 e.printStackTrace();
-                toastMsg("saved image failed");
+                Util.toastMsg(this, "saved image failed");
             }
         });
     }
@@ -166,6 +166,12 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         return anchorNode;
     }
 
+    private void resetScene() {
+        m_btnRecord.setEnabled(false);
+        m_tvDistance.setText("FishNote");
+        clearAnchor();
+    }
+
     private void clearAnchor() {
         m_arFragment.getArSceneView().getScene().removeChild(m_firstAnchorNode);
         m_firstAnchorNode.getAnchor().detach();
@@ -177,35 +183,26 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         m_secondAnchorNode.setParent(null);
         m_secondAnchorNode = null;
 
-        m_nodeForLine = null;
         m_nodeForLine.setParent(null);
+        m_nodeForLine = null;
     }
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onUpdate(FrameTime frameTime) {
-        if (IsDistanceMeasured()) {
-            Pose firstPose = m_firstAnchorNode.getAnchor().getPose();
-            Pose secondPose = m_secondAnchorNode.getAnchor().getPose();
+    private void onDistanceMeasured() {
+        m_btnRecord.setEnabled(true);
 
-            float dx = firstPose.tx() - secondPose.tx();
-            float dy = firstPose.ty() - secondPose.ty();
-            float dz = firstPose.tz() - secondPose.tz();
+        Pose firstPose = m_firstAnchorNode.getAnchor().getPose();
+        Pose secondPose = m_secondAnchorNode.getAnchor().getPose();
 
-            ///Compute the straight-line distance.
-            float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
-            m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
+        float dx = firstPose.tx() - secondPose.tx();
+        float dy = firstPose.ty() - secondPose.ty();
+        float dz = firstPose.tz() - secondPose.tz();
 
-            m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
-            drawLine();
+        ///Compute the straight-line distance.
+        float distanceCm = (float) Math.sqrt(dx * dx + dy * dy + dz * dz) * 100;
+        m_fishSize = (float) (Math.round(distanceCm * 100) / 100.0);
 
-        } else {
-            m_tvDistance.setText("FishNote");
-        }
-    }
-
-    private boolean IsDistanceMeasured() {
-        return m_firstAnchorNode != null && m_secondAnchorNode != null;
+        m_tvDistance.setText("Length Between Two Points : " + m_fishSize + " cm");
+        drawLine();
     }
 
     private String generateFilename() {
@@ -225,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     }
 
     private void takeScreenshotAndMoveToPreview() throws NotYetAvailableException {
+        Util.showDialog(m_dialog, "Saving Image");
         m_capturedBitmap = Bitmap.createBitmap(m_arSceneView.getWidth(), m_arSceneView.getHeight(),
                 Bitmap.Config.ARGB_8888);
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
@@ -246,7 +244,8 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 outputStream.close();
 
                 registerToGallery(path);
-                toastMsg("saved image successfully");
+                m_dialog.dismiss();
+                Util.toastMsg(this, "saved image successfully");
 
                 //move to preview activity
                 Intent intent = new Intent(this, PreViewActivity.class);
@@ -265,11 +264,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         MediaScannerConnection.scanFile(this,
                 new String[] { path }, null,
                 (path1, uri) -> Log.i("TAG", "Finished scanning " + path1));
-    }
-
-    private void toastMsg(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
-        toast.show();
     }
 
     private void drawLine() {
