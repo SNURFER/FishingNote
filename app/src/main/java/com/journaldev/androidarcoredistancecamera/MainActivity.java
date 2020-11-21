@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     private Bitmap m_capturedBitmap;
     private Node m_nodeForLine;
     private float m_fishSize = 0;
+    private ProgressDialog m_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                             m_cubeRenderable.setShadowReceiver(false);
                         });
         m_arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+        m_dialog = new ProgressDialog(this);
     }
 
     private void getView() {
@@ -225,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
     }
 
     private void takeScreenshotAndMoveToPreview() throws NotYetAvailableException {
+        Util.showDialog(m_dialog, "Saving Image");
         m_capturedBitmap = Bitmap.createBitmap(m_arSceneView.getWidth(), m_arSceneView.getHeight(),
                 Bitmap.Config.ARGB_8888);
         final HandlerThread handlerThread = new HandlerThread("PixelCopier");
@@ -246,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 outputStream.close();
 
                 registerToGallery(path);
+                m_dialog.dismiss();
                 Util.toastMsg(this, "saved image successfully");
 
                 //move to preview activity
