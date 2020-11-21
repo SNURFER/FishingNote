@@ -156,12 +156,11 @@ public class MainActivity extends AppCompatActivity implements
     private AnchorNode createAnchorNode(HitResult hitResult) {
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setParent(m_arSceneView.getScene());
+        m_arSceneView.getScene().addChild(anchorNode);
 
         TransformableNode node = new TransformableNode(m_arFragment.getTransformationSystem());
+        anchorNode.addChild(node);
         node.setRenderable(m_cubeRenderable);
-        node.setParent(anchorNode);
-        m_arSceneView.getScene().addChild(anchorNode);
         node.select();
         return anchorNode;
     }
@@ -175,15 +174,13 @@ public class MainActivity extends AppCompatActivity implements
     private void clearAnchor() {
         m_arFragment.getArSceneView().getScene().removeChild(m_firstAnchorNode);
         m_firstAnchorNode.getAnchor().detach();
-        m_firstAnchorNode.setParent(null);
+        m_firstAnchorNode.removeChild(m_nodeForLine);
         m_firstAnchorNode = null;
 
         m_arFragment.getArSceneView().getScene().removeChild(m_secondAnchorNode);
         m_secondAnchorNode.getAnchor().detach();
-        m_secondAnchorNode.setParent(null);
         m_secondAnchorNode = null;
 
-        m_nodeForLine.setParent(null);
         m_nodeForLine = null;
     }
 
@@ -282,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements
                                     new Vector3(.005f, .005f, diffVec.length()),
                                     Vector3.zero(), material);
                             //length with diffVec
-                            Anchor lineAnchor = m_secondAnchorNode.getAnchor();
                             m_nodeForLine = new Node();
                             m_nodeForLine.setParent(m_firstAnchorNode);
                             m_nodeForLine.setRenderable(model);
