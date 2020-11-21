@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                         .getGlEsVersion();
         if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
             Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
-            toastMsg("Sceneform requires OpenGL ES 3.0 or later");
+            Util.toastMsg(this, "Sceneform requires OpenGL ES 3.0 or later");
             activity.finish();
             return false;
         }
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 takeScreenshotAndMoveToPreview();
             } catch (NotYetAvailableException e) {
                 e.printStackTrace();
-                toastMsg("saved image failed");
+                Util.toastMsg(this, "saved image failed");
             }
         });
     }
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
                 outputStream.close();
 
                 registerToGallery(path);
-                toastMsg("saved image successfully");
+                Util.toastMsg(this, "saved image successfully");
 
                 //move to preview activity
                 Intent intent = new Intent(this, PreViewActivity.class);
@@ -265,11 +265,6 @@ public class MainActivity extends AppCompatActivity implements Scene.OnUpdateLis
         MediaScannerConnection.scanFile(this,
                 new String[] { path }, null,
                 (path1, uri) -> Log.i("TAG", "Finished scanning " + path1));
-    }
-
-    private void toastMsg(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
-        toast.show();
     }
 
     private void drawLine() {
