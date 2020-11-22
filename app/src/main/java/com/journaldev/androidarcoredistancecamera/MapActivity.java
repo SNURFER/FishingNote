@@ -15,9 +15,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapActivity extends AppCompatActivity {
-    SupportMapFragment m_mapFragment;
-    GoogleMap m_map;
-    Button m_btnGoBack;
+    private SupportMapFragment m_mapFragment;
+    private GoogleMap m_map;
+    private Button m_btnGoBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
