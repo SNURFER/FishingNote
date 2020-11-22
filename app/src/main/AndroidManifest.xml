@@ -48,6 +48,7 @@
         <activity android:name=".PreViewActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".MapActivity" />
+        <activity android:name=".ViewActivity" />
     </application>
 
 </manifest>

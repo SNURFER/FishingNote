@@ -20,9 +20,8 @@ import androidx.annotation.Nullable;
 import java.util.Vector;
 
 public class PreViewActivity extends Activity {
-    private Button m_btnTest;
     private Button m_btnGoBack;
-    private Button m_btnGetSomething;
+    private Button m_btnGoToView;
     private Button m_btnDelete;
     private Button m_btnSave;
     private Button m_btnGoToMap;
@@ -44,7 +43,7 @@ public class PreViewActivity extends Activity {
         setListeners();
         initialize();
 
-        setPreviewImage(m_intent.getByteArrayExtra("image"));
+        Util.setImageView(m_intent.getByteArrayExtra("image"), m_ivPreviewImage);
     }
 
     private void setListeners() {
@@ -71,13 +70,9 @@ public class PreViewActivity extends Activity {
             }
         });
 
-        m_btnGetSomething.setOnClickListener(v-> {
-            Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
-            if (fishInfos.isEmpty()) {
-                 Util.toastMsg(this, "No Fish Data");
-            } else {
-                setPreviewImage(fishInfos.get(0).image);
-            }
+        m_btnGoToView.setOnClickListener(v-> {
+            Intent intent = new Intent(this, ViewActivity.class);
+            startActivity(intent);
         });
 
         m_btnDelete.setOnClickListener(v-> {
@@ -93,7 +88,7 @@ public class PreViewActivity extends Activity {
 
     private void getView() {
         m_btnGoBack = findViewById((R.id.btnGoBack));
-        m_btnGetSomething = findViewById(R.id.btnGetSometing);
+        m_btnGoToView = findViewById(R.id.btnGoToView);
         m_btnDelete = findViewById(R.id.btnDelete);
         m_btnSave = findViewById(R.id.btnSave);
         m_ivPreviewImage = findViewById(R.id.ivPreviewImage);
@@ -128,12 +123,4 @@ public class PreViewActivity extends Activity {
         m_intent = getIntent();
     }
 
-    private void setPreviewImage (byte[] bytes) {
-        if (bytes == null) {
-            return;
-        }
-
-        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        m_ivPreviewImage.setImageBitmap(image);
-    }
 }
