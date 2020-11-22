@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/ivPreviewImage"
         android:layout_width="match_parent"
-        android:layout_height="363dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -60,5 +60,11 @@
         android:text="Get Someting"
         app:layout_constraintBottom_toTopOf="@id/btnDelete" />
 
+    <Button
+        android:id="@+id/btnGoToMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Map"
+        app:layout_constraintBottom_toTopOf="@id/btnGetSometing" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
