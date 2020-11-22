@@ -54,10 +54,10 @@
         app:layout_constraintBottom_toTopOf="@id/btnSave" />
 
     <Button
-        android:id="@+id/btnGetSometing"
+        android:id="@+id/btnGoToView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get Someting"
+        android:text="Go To View"
         app:layout_constraintBottom_toTopOf="@id/btnDelete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,32 +3,15 @@ package com.journaldev.androidarcoredistancecamera;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.util.Vector;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class PreViewActivity extends Activity {
-    private Button m_btnTest;
     private Button m_btnGoBack;
-    private Button m_btnGetSomething;
+    private Button m_btnGoToView;
     private Button m_btnDelete;
     private Button m_btnSave;
     private Button m_btnGoToMap;
@@ -51,7 +34,7 @@ public class PreViewActivity extends Activity {
         setListeners();
         initialize();
 
-        setPreviewImage(m_intent.getByteArrayExtra("image"));
+        Util.setImageView(m_intent.getByteArrayExtra("image"), m_ivPreviewImage);
     }
 
     private void setListeners() {
@@ -86,18 +69,12 @@ public class PreViewActivity extends Activity {
             }
         });
 
-        m_btnGetSomething.setOnClickListener(v-> {
-            Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
-            if (fishInfos.isEmpty()) {
-                 Util.toastMsg(this, "No Fish Data");
-            } else {
-                setPreviewImage(fishInfos.get(0).image);
-            }
+        m_btnGoToView.setOnClickListener(v-> {
+            Intent intent = new Intent(this, ViewActivity.class);
+            startActivity(intent);
         });
 
-        m_btnDelete.setOnClickListener(v-> {
-            m_localDbHandler.delete();
-        });
+        m_btnDelete.setOnClickListener(v-> m_localDbHandler.delete());
 
         m_btnGoToMap.setOnClickListener(v->{
             Intent intent = new Intent(this, MapActivity.class);
@@ -108,7 +85,7 @@ public class PreViewActivity extends Activity {
 
     private void getView() {
         m_btnGoBack = findViewById((R.id.btnGoBack));
-        m_btnGetSomething = findViewById(R.id.btnGetSometing);
+        m_btnGoToView = findViewById(R.id.btnGoToView);
         m_btnDelete = findViewById(R.id.btnDelete);
         m_btnSave = findViewById(R.id.btnSave);
         m_ivPreviewImage = findViewById(R.id.ivPreviewImage);
@@ -118,38 +95,10 @@ public class PreViewActivity extends Activity {
 
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
-                R.layout.support_simple_spinner_dropdown_item,items) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount()));
-                }
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount() - 1;
-            }
-
-        };
-        m_spnFishTypes.setAdapter(arrayAdapter);
-        m_spnFishTypes.setSelection(arrayAdapter.getCount());
+        Util.adaptSpinner(items, m_spnFishTypes, this);
         m_localDbHandler =  new DbHandler(this);
         m_intent = getIntent();
         m_progressDialog = new ProgressDialog(this);
     }
 
-    private void setPreviewImage (byte[] bytes) {
-        if (bytes == null) {
-            return;
-        }
-
-        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        m_ivPreviewImage.setImageBitmap(image);
-    }
 }

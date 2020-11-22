@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements
                 //move to preview activity
                 Intent intent = new Intent(this, PreViewActivity.class);
                 byte[] byteArray = previewImageStream.toByteArray();
-                intent.putExtra("image",byteArray);
+                intent.putExtra("image", byteArray);
                 intent.putExtra("fish_size", m_fishSize);
                 startActivity(intent);
 
