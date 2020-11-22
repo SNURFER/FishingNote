@@ -1,10 +1,12 @@
 package com.journaldev.androidarcoredistancecamera;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 public class PreViewActivity extends Activity {
@@ -19,6 +21,7 @@ public class PreViewActivity extends Activity {
     private DbHandler m_localDbHandler;
     private Intent m_intent;
     private boolean m_isSaved = false;
+    private ProgressDialog m_progressDialog;
 
     /*TODO refactor*/
     private final int FISH_TYPE_NOT_SELECTED = 4;
@@ -41,15 +44,23 @@ public class PreViewActivity extends Activity {
             finish();
         });
         m_btnSave.setOnClickListener(v-> {
-            /*TODO use asynctask*/
             if (!m_isSaved) {
                 if (m_spnFishTypes.getSelectedItemPosition() != FISH_TYPE_NOT_SELECTED) {
-                    m_localDbHandler.insertInToFishInfo(0,
-                            m_spnFishTypes.getSelectedItem().toString(),
-                            m_intent.getFloatExtra("fish_size", 0),
-                            m_intent.getByteArrayExtra("image"),
-                            "", 0, 0);
-                    m_isSaved = true;
+                    final Executor executor = Executors.newSingleThreadExecutor();
+                    final Handler handler = new Handler(Looper.getMainLooper());
+                    Util.showDialog(m_progressDialog, "Saving Data");
+                    executor.execute(() -> {
+                        m_localDbHandler.insertInToFishInfo(0,
+                                m_spnFishTypes.getSelectedItem().toString(),
+                                m_intent.getFloatExtra("fish_size", 0),
+                                m_intent.getByteArrayExtra("image"),
+                                "", 0, 0);
+                        m_isSaved = true;
+                        handler.post(() -> {
+                            m_progressDialog.dismiss();
+                            Util.toastMsg(this, "Saved data successfully");
+                        });
+                    });
                 } else {
                     Util.toastMsg(this, "Must choose fish type");
                 }
@@ -87,6 +98,7 @@ public class PreViewActivity extends Activity {
         Util.adaptSpinner(items, m_spnFishTypes, this);
         m_localDbHandler =  new DbHandler(this);
         m_intent = getIntent();
+        m_progressDialog = new ProgressDialog(this);
     }
 
 }
