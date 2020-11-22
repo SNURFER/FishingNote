@@ -79,4 +79,5 @@ public class DbHandler {
         }
         return fishInfos;
     }
+
 }
