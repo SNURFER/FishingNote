@@ -2,22 +2,10 @@ package com.journaldev.androidarcoredistancecamera;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.util.Vector;
 
 public class PreViewActivity extends Activity {
     private Button m_btnGoBack;
@@ -75,9 +63,7 @@ public class PreViewActivity extends Activity {
             startActivity(intent);
         });
 
-        m_btnDelete.setOnClickListener(v-> {
-            m_localDbHandler.delete();
-        });
+        m_btnDelete.setOnClickListener(v-> m_localDbHandler.delete());
 
         m_btnGoToMap.setOnClickListener(v->{
             Intent intent = new Intent(this, MapActivity.class);
@@ -98,27 +84,7 @@ public class PreViewActivity extends Activity {
 
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
-                R.layout.support_simple_spinner_dropdown_item,items) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount()));
-                }
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount() - 1;
-            }
-
-        };
-        m_spnFishTypes.setAdapter(arrayAdapter);
-        m_spnFishTypes.setSelection(arrayAdapter.getCount());
+        Util.adaptSpinner(items, m_spnFishTypes, this);
         m_localDbHandler =  new DbHandler(this);
         m_intent = getIntent();
     }

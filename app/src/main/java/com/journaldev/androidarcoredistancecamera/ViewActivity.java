@@ -3,16 +3,9 @@ package com.journaldev.androidarcoredistancecamera;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.Vector;
 
@@ -44,7 +37,7 @@ public class ViewActivity extends Activity {
 
     private void setListeners() {
         m_btnGoBackToPreView.setOnClickListener(v->{
-            Intent intent = new Intent(this, PreViewActivity.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         });
@@ -61,27 +54,7 @@ public class ViewActivity extends Activity {
 
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
-                R.layout.support_simple_spinner_dropdown_item,items) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount()));
-                }
-                return v;
-            }
-
-            @Override
-            public int getCount() {
-                return super.getCount() - 1;
-            }
-
-        };
-        m_spnFishTypesCondition.setAdapter(arrayAdapter);
-        m_spnFishTypesCondition.setSelection(arrayAdapter.getCount());
+        Util.adaptSpinner(items, m_spnFishTypesCondition, this);
         m_localDbHandler = new DbHandler(this);
     }
 }
