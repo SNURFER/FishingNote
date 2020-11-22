@@ -29,22 +29,18 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAN4hOhXwlmWBPElqjuvE5rtGrgdmp4ksE" />
-
-        <activity android:name=".MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:screenOrientation="locked"
-            android:exported="true">
-
-
-
+        <activity android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoadingActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="locked"
+            android:exported="true" />
         <activity android:name=".PreViewActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".MapActivity" />
