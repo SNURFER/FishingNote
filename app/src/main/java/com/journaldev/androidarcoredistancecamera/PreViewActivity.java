@@ -25,6 +25,7 @@ public class PreViewActivity extends Activity {
     private Button m_btnGetSomething;
     private Button m_btnDelete;
     private Button m_btnSave;
+    private Button m_btnGoToMap;
     private ImageView m_ivPreviewImage;
     private Spinner   m_spnFishTypes;
 
@@ -47,10 +48,6 @@ public class PreViewActivity extends Activity {
     }
 
     private void setListeners() {
-        m_btnTest.setOnClickListener(v->{
-            Intent intent = new Intent(this, TestActivity.class);
-            startActivity(intent);
-        });
         m_btnGoBack.setOnClickListener(v-> {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -87,16 +84,21 @@ public class PreViewActivity extends Activity {
             m_localDbHandler.delete();
         });
 
+        m_btnGoToMap.setOnClickListener(v->{
+            Intent intent = new Intent(this, MapActivity.class);
+            startActivity(intent);
+        });
+
     }
 
     private void getView() {
-        m_btnTest = findViewById((R.id.btnTest));
         m_btnGoBack = findViewById((R.id.btnGoBack));
         m_btnGetSomething = findViewById(R.id.btnGetSometing);
         m_btnDelete = findViewById(R.id.btnDelete);
         m_btnSave = findViewById(R.id.btnSave);
         m_ivPreviewImage = findViewById(R.id.ivPreviewImage);
         m_spnFishTypes = findViewById(R.id.spnFishTypes);
+        m_btnGoToMap = findViewById(R.id.btnGoToMap);
     }
 
     private void initialize() {
@@ -127,6 +129,10 @@ public class PreViewActivity extends Activity {
     }
 
     private void setPreviewImage (byte[] bytes) {
+        if (bytes == null) {
+            return;
+        }
+
         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         m_ivPreviewImage.setImageBitmap(image);
     }

@@ -26,6 +26,9 @@
         <meta-data
             android:name="com.google.ar.core"
             android:value="required" />
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAN4hOhXwlmWBPElqjuvE5rtGrgdmp4ksE" />
 
         <activity android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
@@ -44,6 +47,7 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name=".PreViewActivity" />
         <activity android:name=".TestActivity" />
+        <activity android:name=".MapActivity" />
     </application>
 
 </manifest>
