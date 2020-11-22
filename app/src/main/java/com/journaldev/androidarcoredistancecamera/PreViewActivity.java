@@ -60,10 +60,11 @@ public class PreViewActivity extends Activity {
             /*TODO use asynctask*/
             if (!m_isSaved) {
                 if (m_spnFishTypes.getSelectedItemPosition() != FISH_TYPE_NOT_SELECTED) {
-                    m_localDbHandler.InsertInToFishInfo(0,
+                    m_localDbHandler.insertInToFishInfo(0,
                             m_spnFishTypes.getSelectedItem().toString(),
                             m_intent.getFloatExtra("fish_size", 0),
-                            m_intent.getByteArrayExtra("image"));
+                            m_intent.getByteArrayExtra("image"),
+                            "", 0, 0);
                     m_isSaved = true;
                 } else {
                     Util.toastMsg(this, "Must choose fish type");
@@ -74,12 +75,16 @@ public class PreViewActivity extends Activity {
         });
 
         m_btnGetSomething.setOnClickListener(v-> {
-            Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.SelectFromFishInfo(null);
-            setPreviewImage(fishInfos.get(0).image);
+            Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
+            if (fishInfos.isEmpty()) {
+                 Util.toastMsg(this, "No Fish Data");
+            } else {
+                setPreviewImage(fishInfos.get(0).image);
+            }
         });
 
         m_btnDelete.setOnClickListener(v-> {
-            m_localDbHandler.Delete();
+            m_localDbHandler.delete();
         });
 
     }
