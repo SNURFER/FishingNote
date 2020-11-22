@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import java.util.Vector;
@@ -14,7 +14,8 @@ public class ViewActivity extends Activity {
     private Button m_btnGoBackToPreView;
     private Button m_btnSetView;
     private Spinner m_spnFishTypesCondition;
-    private ImageView m_ivSearchedImage;
+    private ListView m_lvSelectedImages;
+    private ListViewAdapter m_listViewAdapter;
 
     private DbHandler m_localDbHandler;
 
@@ -32,7 +33,7 @@ public class ViewActivity extends Activity {
         m_btnGoBackToPreView = findViewById(R.id.btnGoBackToPreview);
         m_btnSetView = findViewById(R.id.btnSetView);
         m_spnFishTypesCondition = findViewById(R.id.spnFishTypesCondition);
-        m_ivSearchedImage = findViewById(R.id.ivSearchedImage);
+        m_lvSelectedImages = findViewById(R.id.lvSelectedImages);
     }
 
     private void setListeners() {
@@ -47,7 +48,11 @@ public class ViewActivity extends Activity {
             if (fishInfos.isEmpty()) {
                 Util.toastMsg(this, "No Fish Data");
             } else {
-                Util.setImageView(fishInfos.get(0).image, m_ivSearchedImage);
+                m_listViewAdapter.clear();
+                for (DbHandler.FishInfo fishInfo : fishInfos) {
+                    m_listViewAdapter.addItem(fishInfo.image, fishInfo.name, fishInfo.size);
+                }
+                m_listViewAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -55,6 +60,8 @@ public class ViewActivity extends Activity {
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
         Util.adaptSpinner(items, m_spnFishTypesCondition, this);
+        m_listViewAdapter= new ListViewAdapter();
+        m_lvSelectedImages.setAdapter(m_listViewAdapter);
         m_localDbHandler = new DbHandler(this);
     }
 }

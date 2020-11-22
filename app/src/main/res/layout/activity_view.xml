@@ -5,17 +5,6 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageView
-        android:id="@+id/ivSearchedImage"
-        android:layout_width="match_parent"
-        android:layout_height="363dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_launcher_background"
-        tools:ignore="MissingConstraints" />
-
     <Spinner
         android:id="@+id/spnFishTypesCondition"
         android:layout_width="match_parent"
@@ -37,4 +26,11 @@
         android:layout_height="wrap_content"
         android:text="Set View"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ListView
+        android:id="@+id/lvSelectedImages"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        app:layout_constraintBottom_toTopOf="@id/btnSetView"
+        app:layout_constraintTop_toBottomOf="@id/spnFishTypesCondition" />
 </androidx.constraintlayout.widget.ConstraintLayout>
