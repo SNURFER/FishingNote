@@ -122,6 +122,10 @@ public class PreViewActivity extends Activity {
     }
 
     private void setPreviewImage (byte[] bytes) {
+        if (bytes == null) {
+            return;
+        }
+
         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         m_ivPreviewImage.setImageBitmap(image);
     }
