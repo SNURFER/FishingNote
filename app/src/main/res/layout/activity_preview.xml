@@ -6,10 +6,10 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/btnTest"
+        android:id="@+id/btnGoToMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test"
+        android:text="Map"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/ivPreviewImage"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="363dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -36,7 +36,7 @@
         android:id="@+id/spnFishTypes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btnTest"
+        app:layout_constraintTop_toBottomOf="@id/btnGoBack"
         tools:layout_editor_absoluteX="0dp" />
 
     <Button
@@ -59,12 +59,5 @@
         android:layout_height="wrap_content"
         android:text="Get Someting"
         app:layout_constraintBottom_toTopOf="@id/btnDelete" />
-
-    <Button
-        android:id="@+id/btnGoToMap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Map"
-        app:layout_constraintBottom_toTopOf="@id/btnGetSometing" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

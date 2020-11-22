@@ -48,10 +48,6 @@ public class PreViewActivity extends Activity {
     }
 
     private void setListeners() {
-        m_btnTest.setOnClickListener(v->{
-            Intent intent = new Intent(this, TestActivity.class);
-            startActivity(intent);
-        });
         m_btnGoBack.setOnClickListener(v-> {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -91,7 +87,6 @@ public class PreViewActivity extends Activity {
     }
 
     private void getView() {
-        m_btnTest = findViewById((R.id.btnTest));
         m_btnGoBack = findViewById((R.id.btnGoBack));
         m_btnGetSomething = findViewById(R.id.btnGetSometing);
         m_btnDelete = findViewById(R.id.btnDelete);
