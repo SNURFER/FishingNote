@@ -76,17 +76,13 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         if (!checkIsSupportedDeviceOrFinish(this)) {
-            Toast.makeText(getApplicationContext(), "Device not supported",
-                    Toast.LENGTH_LONG).show();
+            Util.toastMsg(getApplicationContext(), "Device not supported");
         }
 
         setContentView(R.layout.activity_main);
         /*Permissions*/
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-        /*Loading*/
-        Intent intent = new Intent(this, LoadingActivity.class);
-        startActivity(intent);
         /*Init*/
         initialize();
         getView();
