@@ -90,10 +90,10 @@ public class MapActivity extends AppCompatActivity {
         myMarker.snippet("from GPS info");
         int height = 60;
         int width = 60;
-        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable. marker);
-        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-        BitmapDescriptor smallMarkerIcon = BitmapDescriptorFactory.fromBitmap(smallMarker);
-        myMarker.icon(smallMarkerIcon);
+        Bitmap marker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+        Bitmap resizeMarker = Bitmap.createScaledBitmap(marker, width, height, false);
+        BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(resizeMarker);
+        myMarker.icon(markerIcon);
         m_map.addMarker(myMarker);
     }
 
@@ -112,7 +112,7 @@ public class MapActivity extends AppCompatActivity {
                 LatLng randLocation = genPositionTemp();
                 newMarker.position(randLocation);
                 newMarker.title(fishInfo.name);
-                newMarker.snippet("the length of the fish caught is : " + fishInfo.size);
+                newMarker.snippet("The length of the fish caught is : " + fishInfo.size);
                 newMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
                 m_map.addMarker(newMarker);
             }
