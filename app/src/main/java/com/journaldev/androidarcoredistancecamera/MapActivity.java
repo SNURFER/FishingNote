@@ -1,6 +1,8 @@
 package com.journaldev.androidarcoredistancecamera;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -11,13 +13,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class MapActivity extends AppCompatActivity {
     private SupportMapFragment m_mapFragment;
     private GoogleMap m_map;
     private Button m_btnGoBack;
+    private DbHandler m_localDbHandler;
+    private ArrayList<MarkerOptions> m_fishMarkerVector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +39,9 @@ public class MapActivity extends AppCompatActivity {
         LatLng curLocation = new LatLng(36.92997889253426, 127.0376082778128);
 
         getView();
-        initMap(curLocation);
         setListeners();
+        initialize();
+        initMap(curLocation);
     }
 
     private void getView() {
@@ -56,7 +66,10 @@ public class MapActivity extends AppCompatActivity {
                 m_map = googleMap;
 //                remove comment if current location is calculated by this activity
 //                m_map.setMyLocationEnabled(true);
-                setLocation(curLocation);
+                setMyLocation(curLocation);
+
+                //create all the records of fishing by marker
+                setFishInfoMarker();
             }
         });
         try {
@@ -67,21 +80,53 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    private void setLocation(LatLng curLocation) {
-        //set currentLocation
-        m_map.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation, 15));
+    private void setMyLocation(LatLng curLocation) {
+        //set zoom
+        m_map.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation, 9));
 
-        //set current Location Marker
-        MarkerOptions curLocationMarker = new MarkerOptions();
-        curLocationMarker.position(curLocation);
-        curLocationMarker.title("my location");
-        curLocationMarker.snippet("from GPS info");
-        //TODO : need specific image of may current location marker
-        //currentLocationMarker.icon(BitmapDescriptorFactory.formResource(R.drawable.xx);
-        m_map.addMarker(curLocationMarker);
+        MarkerOptions myMarker = new MarkerOptions();
+        myMarker.position(curLocation);
+        myMarker.title("my location");
+        myMarker.snippet("from GPS info");
+        int height = 60;
+        int width = 60;
+        Bitmap marker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+        Bitmap resizeMarker = Bitmap.createScaledBitmap(marker, width, height, false);
+        BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(resizeMarker);
+        myMarker.icon(markerIcon);
+        m_map.addMarker(myMarker);
+    }
 
-        //TODO : set local fish info to marker
-        //create all the records of fishing by marker
+    private void initialize() {
+        m_localDbHandler =  new DbHandler(this);
+        m_fishMarkerVector = new ArrayList<MarkerOptions>();
+    }
+
+    //TODO : this function should be flexible to create marker by fish type
+    private void setFishInfoMarker() {
+        Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
+        if (!fishInfos.isEmpty()) {
+            m_fishMarkerVector.clear();
+            for (DbHandler.FishInfo fishInfo : fishInfos) {
+                MarkerOptions newMarker = new MarkerOptions();
+                LatLng randLocation = genPositionTemp();
+                newMarker.position(randLocation);
+                newMarker.title(fishInfo.name);
+                newMarker.snippet("The length of the fish caught is : " + fishInfo.size);
+                newMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                m_map.addMarker(newMarker);
+            }
+        }
+    }
+
+    //will be removed
+    private LatLng genPositionTemp() {
+        double altitude, longitude;
+        longitude = 35 + (38 - 35) * Math.random();
+        altitude = 127 + (129 - 127) * Math.random();
+        LatLng ret = new LatLng(longitude, altitude);
+
+        return ret;
     }
 }
 
