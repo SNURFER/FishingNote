@@ -69,6 +69,14 @@ public class ViewActivity extends Activity {
             popupMenu.show();
             return false;
         });
+
+        m_lvSelectedImages.setOnItemClickListener((parent, view, position, id) -> {
+            FishListViewItem fishListViewItem =
+                    (FishListViewItem) m_fishListViewAdapter.getItem(position);
+            Intent intent = new Intent(this, FullImageActivity.class);
+            intent.putExtra("image", fishListViewItem.getM_image());
+            startActivity(intent);
+        });
     }
 
     private void initialize() {
