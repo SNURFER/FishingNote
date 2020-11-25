@@ -54,7 +54,7 @@ public class PreViewActivity extends Activity {
                     final Handler handler = new Handler(Looper.getMainLooper());
                     Util.showDialog(m_progressDialog, "Saving Data");
                     executor.execute(() -> {
-                        m_localDbHandler.insertInToFishInfo(0,
+                        m_localDbHandler.insertInToFishInfo(
                                 m_spnFishTypes.getSelectedItem().toString(),
                                 m_intent.getFloatExtra("fish_size", 0),
                                 m_intent.getByteArrayExtra("image"),
@@ -78,7 +78,7 @@ public class PreViewActivity extends Activity {
             startActivity(intent);
         });
 
-        m_btnDelete.setOnClickListener(v-> m_localDbHandler.delete());
+        m_btnDelete.setOnClickListener(v-> m_localDbHandler.deleteAll());
 
         m_btnGoToMap.setOnClickListener(v->{
             Intent intent = new Intent(this, MapActivity.class);
