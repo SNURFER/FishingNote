@@ -3,8 +3,12 @@ package com.journaldev.androidarcoredistancecamera;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 
 import java.util.Vector;
@@ -15,7 +19,7 @@ public class ViewActivity extends Activity {
     private Button m_btnSetView;
     private Spinner m_spnFishTypesCondition;
     private ListView m_lvSelectedImages;
-    private ListViewAdapter m_listViewAdapter;
+    private FishListViewAdapter m_fishListViewAdapter;
 
     private DbHandler m_localDbHandler;
 
@@ -44,24 +48,46 @@ public class ViewActivity extends Activity {
         });
 
         m_btnSetView.setOnClickListener(v->{
-            Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
-            if (fishInfos.isEmpty()) {
-                Util.toastMsg(this, "No Fish Data");
-            } else {
-                m_listViewAdapter.clear();
-                for (DbHandler.FishInfo fishInfo : fishInfos) {
-                    m_listViewAdapter.addItem(fishInfo.image, fishInfo.name, fishInfo.size);
+            setFishListViewFromDb();
+        });
+
+        m_lvSelectedImages.setOnItemLongClickListener((parent, view, position, id) -> {
+            PopupMenu popupMenu = new PopupMenu(this, view);
+            getMenuInflater().inflate(R.menu.modify_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.mnDelete:
+                        FishListViewItem fishListViewItem =
+                                (FishListViewItem) m_fishListViewAdapter.getItem(position);
+                        m_localDbHandler.deleteSingle(fishListViewItem.getM_id());
+                        setFishListViewFromDb();
+                    break;
+                    /*TODO Update menu will be added*/
                 }
-                m_listViewAdapter.notifyDataSetChanged();
-            }
+                return false;
+            });
+            popupMenu.show();
+            return false;
         });
     }
 
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
         Util.adaptSpinner(items, m_spnFishTypesCondition, this);
-        m_listViewAdapter= new ListViewAdapter();
-        m_lvSelectedImages.setAdapter(m_listViewAdapter);
+        m_fishListViewAdapter= new FishListViewAdapter();
+        m_lvSelectedImages.setAdapter(m_fishListViewAdapter);
         m_localDbHandler = new DbHandler(this);
+    }
+
+    private void setFishListViewFromDb() {
+        m_fishListViewAdapter.clear();
+        Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
+        if (!fishInfos.isEmpty()) {
+            for (DbHandler.FishInfo fishInfo : fishInfos) {
+                m_fishListViewAdapter.addItem(fishInfo.id, fishInfo.image, fishInfo.name,
+                        fishInfo.size);
+            }
+        }
+        m_fishListViewAdapter.notifyDataSetChanged();
     }
 }

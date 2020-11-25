@@ -11,15 +11,15 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListViewAdapter extends BaseAdapter {
-    private ArrayList<ListViewItem> listViewItemList = new ArrayList<>() ;
+public class FishListViewAdapter extends BaseAdapter {
+    private ArrayList<FishListViewItem> m_fishListViewItemList = new ArrayList<>() ;
 
-    public ListViewAdapter() {
+    public FishListViewAdapter() {
     }
 
     @Override
     public int getCount() {
-        return listViewItemList.size() ;
+        return m_fishListViewItemList.size() ;
     }
 
     @SuppressLint("SetTextI18n")
@@ -40,11 +40,11 @@ public class ListViewAdapter extends BaseAdapter {
         TextView tvSize = convertView.findViewById(R.id.tvSize);
         TextView tvName = convertView.findViewById(R.id.tvName);
 
-        ListViewItem listViewItem = listViewItemList.get(position);
+        FishListViewItem fishListViewItem= m_fishListViewItemList.get(position);
 
-        Util.setImageView(listViewItem.getM_image(), ivFish);
-        tvSize.setText(listViewItem.getM_size().toString());
-        tvName.setText(listViewItem.getM_name());
+        Util.setImageView(fishListViewItem.getM_image(), ivFish);
+        tvSize.setText(fishListViewItem.getM_size().toString());
+        tvName.setText(fishListViewItem.getM_name());
 
         return convertView;
     }
@@ -56,15 +56,15 @@ public class ListViewAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return listViewItemList.get(position) ;
+        return m_fishListViewItemList.get(position) ;
     }
 
-    public void addItem(byte[] image, String name, Float size) {
-        ListViewItem item = new ListViewItem(image, name, size);
-        listViewItemList.add(item);
+    public void addItem(int id, byte[] image, String name, Float size) {
+        FishListViewItem item = new FishListViewItem(id, image, name, size);
+        m_fishListViewItemList.add(item);
     }
 
     public void clear() {
-        listViewItemList.clear();
+        m_fishListViewItemList.clear();
     }
 }
