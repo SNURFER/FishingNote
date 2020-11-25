@@ -26,7 +26,6 @@ public class MapActivity extends AppCompatActivity {
     private GoogleMap m_map;
     private Button m_btnGoBack;
     private DbHandler m_localDbHandler;
-    private ArrayList<MarkerOptions> m_fishMarkerVector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,14 +98,12 @@ public class MapActivity extends AppCompatActivity {
 
     private void initialize() {
         m_localDbHandler =  new DbHandler(this);
-        m_fishMarkerVector = new ArrayList<MarkerOptions>();
     }
 
     //TODO : this function should be flexible to create marker by fish type
     private void setFishInfoMarker() {
         Vector<DbHandler.FishInfo> fishInfos = m_localDbHandler.selectFromFishInfo(null);
         if (!fishInfos.isEmpty()) {
-            m_fishMarkerVector.clear();
             for (DbHandler.FishInfo fishInfo : fishInfos) {
                 MarkerOptions newMarker = new MarkerOptions();
                 LatLng randLocation = genPositionTemp();
