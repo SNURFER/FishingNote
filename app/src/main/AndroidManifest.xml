@@ -45,6 +45,7 @@
         <activity android:name=".TestActivity" />
         <activity android:name=".MapActivity" />
         <activity android:name=".ViewActivity" />
+        <activity android:name=".FullImageActivity" />
     </application>
 
 </manifest>

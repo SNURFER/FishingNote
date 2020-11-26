@@ -19,29 +19,33 @@ public class DbHandler {
     }
     //Table Memory Structures
     public static class FishInfo {
-        public int user_id;
+        public int id;
         public String name;
         public float size;
         public byte[] image;
     }
     //Public methods
 
-    public void insertInToFishInfo(int user_id, String name, float size, byte[] image, String date,
+    public void insertInToFishInfo(String name, float size, byte[] image, String date,
                                    float altitude, float latitude) {
         SQLiteStatement insertQuery = this.m_database.compileStatement("INSERT INTO FISH_INFO " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?);");
-        insertQuery.bindDouble(1, user_id);
-        insertQuery.bindString(2, name);
-        insertQuery.bindDouble(3, size);
-        insertQuery.bindBlob(4, image);
-        insertQuery.bindString(5, date);
-        insertQuery.bindDouble(6, altitude);
-        insertQuery.bindDouble(7, latitude);
+                "VALUES (NULL, ?, ?, ?, ?, ?, ?);");
+        insertQuery.bindString(1, name);
+        insertQuery.bindDouble(2, size);
+        insertQuery.bindBlob(3, image);
+        insertQuery.bindString(4, date);
+        insertQuery.bindDouble(5, altitude);
+        insertQuery.bindDouble(6, latitude);
         insertQuery.executeInsert();
     }
 
-    public void delete () {
+    public void deleteAll () {
         String deleteQuery = "Delete From FISH_INFO";
+        this.m_database.execSQL(deleteQuery);
+    }
+
+    public void deleteSingle (int id) {
+        String deleteQuery = "Delete From FISH_INFO WHERE id = " + id;
         this.m_database.execSQL(deleteQuery);
     }
 
@@ -58,7 +62,7 @@ public class DbHandler {
     }
     //Private methods
     private void createTables() {
-        String createFishInfo = "CREATE TABLE IF NOT EXISTS FISH_INFO (user_id INTEGER, " +
+        String createFishInfo = "CREATE TABLE IF NOT EXISTS FISH_INFO (id INTEGER PRIMARY KEY, " +
                 " name TEXT, size REAL, image BLOB, date TEXT, altitude REAL, latitude REAL);";
         this.m_database.execSQL(createFishInfo);
     }
@@ -70,7 +74,7 @@ public class DbHandler {
             return fishInfos;
         while(!csr.isAfterLast()) {
             FishInfo fishInfo = new FishInfo();
-            fishInfo.user_id = csr.getInt(csr.getColumnIndex("user_id"));
+            fishInfo.id = csr.getInt(csr.getColumnIndex("id"));
             fishInfo.name = csr.getString(csr.getColumnIndex("name"));
             fishInfo.size = csr.getFloat(csr.getColumnIndex("size"));
             fishInfo.image = csr.getBlob(csr.getColumnIndex("image"));
