@@ -64,10 +64,10 @@ public class ViewActivity extends Activity {
                     break;
                     /*TODO Update menu will be added*/
                 }
-                return false;
+                return true;
             });
             popupMenu.show();
-            return false;
+            return true;
         });
 
         m_lvSelectedImages.setOnItemClickListener((parent, view, position, id) -> {
