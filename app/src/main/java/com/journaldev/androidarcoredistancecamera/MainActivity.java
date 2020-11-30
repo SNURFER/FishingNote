@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
@@ -46,6 +48,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -79,10 +82,11 @@ public class MainActivity extends AppCompatActivity implements
             Util.toastMsg(getApplicationContext(), "Device not supported");
         }
 
-        setContentView(R.layout.activity_main);
         /*Permissions*/
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        checkPermissions();
+
+        setContentView(R.layout.activity_main);
+
         /*Init*/
         initialize();
         getView();
@@ -102,6 +106,28 @@ public class MainActivity extends AppCompatActivity implements
             return false;
         }
         return true;
+    }
+
+    private void checkPermissions() {
+        ArrayList<String> targetList = new ArrayList<>();
+        String[] permissions = {
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        for (String curPermission : permissions) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, curPermission);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                targetList.add(curPermission);
+            }
+        }
+
+        if (!targetList.isEmpty()) {
+            String[] targets = new String[targetList.size()];
+            targetList.toArray(targets);
+
+            ActivityCompat.requestPermissions(this, targets, 101);
+        }
     }
 
     private void initialize() {
@@ -289,4 +315,24 @@ public class MainActivity extends AppCompatActivity implements
                         }
                 );
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                           int[] grantResults) {
+
+        switch (requestCode) {
+            case 101: {
+                if (grantResults.length > 0) {
+                    for(int i = 0; i < grantResults.length; ++i) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            Util.toastMsg(this, permissions[i] + "권한을 사용자가 승인함");
+                        } else {
+                            Util.toastMsg(this, permissions[i] + "권한 거부됨");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
