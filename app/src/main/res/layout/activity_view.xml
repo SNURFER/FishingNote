@@ -9,11 +9,11 @@
         android:id="@+id/spnFishTypesCondition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btnGoBackToPreview"
+        app:layout_constraintTop_toBottomOf="@id/btnGoBackToMain"
         tools:layout_editor_absoluteX="0dp" />
 
     <Button
-        android:id="@+id/btnGoBackToPreview"
+        android:id="@+id/btnGoBackToMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="GoBack"

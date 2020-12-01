@@ -51,6 +51,8 @@ public class MapActivity extends AppCompatActivity {
     private void setListeners() {
         m_btnGoBack.setOnClickListener(v -> {
             Intent intent = new Intent(this, PreViewActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
         });
