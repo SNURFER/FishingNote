@@ -15,7 +15,7 @@ import java.util.Vector;
 
 public class ViewActivity extends Activity {
 
-    private Button m_btnGoBackToPreView;
+    private Button m_btnGoBackToMain;
     private Button m_btnSetView;
     private Spinner m_spnFishTypesCondition;
     private ListView m_lvSelectedImages;
@@ -34,15 +34,16 @@ public class ViewActivity extends Activity {
     }
 
     private void getView() {
-        m_btnGoBackToPreView = findViewById(R.id.btnGoBackToPreview);
+        m_btnGoBackToMain = findViewById(R.id.btnGoBackToMain);
         m_btnSetView = findViewById(R.id.btnSetView);
         m_spnFishTypesCondition = findViewById(R.id.spnFishTypesCondition);
         m_lvSelectedImages = findViewById(R.id.lvSelectedImages);
     }
 
     private void setListeners() {
-        m_btnGoBackToPreView.setOnClickListener(v->{
+        m_btnGoBackToMain.setOnClickListener(v->{
             Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
         });

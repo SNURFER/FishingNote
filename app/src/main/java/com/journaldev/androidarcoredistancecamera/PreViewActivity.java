@@ -44,6 +44,7 @@ public class PreViewActivity extends Activity {
     private void setListeners() {
         m_btnGoBack.setOnClickListener(v-> {
             Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
         });
