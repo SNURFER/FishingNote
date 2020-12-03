@@ -85,7 +85,7 @@ public class ViewActivity extends Activity {
         Util.adaptSpinner(items, m_spnFishTypesCondition, this);
         m_fishListViewAdapter= new FishListViewAdapter();
         m_lvSelectedImages.setAdapter(m_fishListViewAdapter);
-        m_localDbHandler = new DbHandler(this);
+        m_localDbHandler = DbHandler.getInstance(this);
     }
 
     private void setFishListViewFromDb() {

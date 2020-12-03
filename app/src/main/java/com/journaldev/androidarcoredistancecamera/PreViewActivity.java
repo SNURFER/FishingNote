@@ -101,7 +101,7 @@ public class PreViewActivity extends Activity {
     private void initialize() {
         String[] items = getResources().getStringArray(R.array.FishTypes);
         Util.adaptSpinner(items, m_spnFishTypes, this);
-        m_localDbHandler =  new DbHandler(this);
+        m_localDbHandler =  DbHandler.getInstance(this);
         m_intent = getIntent();
         m_progressDialog = new ProgressDialog(this);
     }

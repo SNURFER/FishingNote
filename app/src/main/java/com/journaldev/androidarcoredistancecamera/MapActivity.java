@@ -99,7 +99,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void initialize() {
-        m_localDbHandler =  new DbHandler(this);
+        m_localDbHandler =  DbHandler.getInstance(this);
     }
 
     //TODO : this function should be flexible to create marker by fish type

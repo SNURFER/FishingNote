@@ -3,20 +3,38 @@ package com.journaldev.androidarcoredistancecamera;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 import java.util.Vector;
 
-public class DbHandler {
-    private Context m_context = null;
-    private SQLiteDatabase m_database = null;
+public class DbHandler extends SQLiteOpenHelper {
+    private static final int DB_VERSION = 1;
+    private static final String DB_NAME = "FISHDB";
+    private static DbHandler m_dbHandler = null;
 
-    public DbHandler(Context context) {
-        this.m_context = context;
-        this.m_database = this.m_context.openOrCreateDatabase("FISHDB",
-                Context.MODE_PRIVATE, null);
-        createTables();
+    private SQLiteDatabase m_database;
+
+    public static DbHandler getInstance(Context context) {
+        if (m_dbHandler == null)
+            m_dbHandler = new DbHandler(context);
+        return m_dbHandler;
     }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        createTables();
+        insertIntoFishTypes("참돔");
+        insertIntoFishTypes("배스");
+        insertIntoFishTypes("붉바리");
+        insertIntoFishTypes("돌돔");
+        insertIntoFishTypes("송어");
+    }
+
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        dropTables();
+    }
+
     //Table Memory Structures
     public static class FishInfo {
         public int id;
@@ -36,6 +54,13 @@ public class DbHandler {
         insertQuery.bindString(4, date);
         insertQuery.bindDouble(5, altitude);
         insertQuery.bindDouble(6, latitude);
+        insertQuery.executeInsert();
+    }
+
+    public void insertIntoFishTypes(String fishType) {
+        SQLiteStatement insertQuery = this.m_database.compileStatement("INSERT INTO FISH_TYPES " +
+                "VALUES (?);");
+        insertQuery.bindString(1, fishType);
         insertQuery.executeInsert();
     }
 
@@ -61,10 +86,24 @@ public class DbHandler {
         return convertToFishInfos(csr);
     }
     //Private methods
+    private DbHandler(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+        m_database = getWritableDatabase();
+    }
+
     private void createTables() {
         String createFishInfo = "CREATE TABLE IF NOT EXISTS FISH_INFO (id INTEGER PRIMARY KEY, " +
                 " name TEXT, size REAL, image BLOB, date TEXT, altitude REAL, latitude REAL);";
+        String createFishtypes = "CREATE TABLE IF NOT EXISTS FISH_TYPES(fish_type TEXT);";
         this.m_database.execSQL(createFishInfo);
+        this.m_database.execSQL(createFishtypes);
+    }
+
+    private void dropTables() {
+        String dropFishInfo = "DROP TABLE IF EXISTS FISH_INFO;";
+        String dropFishTypes = "DROP TABLE IF EXISTS FISH_TYPES;";
+        this.m_database.execSQL(dropFishInfo);
+        this.m_database.execSQL(dropFishTypes);
     }
 
     private Vector<FishInfo> convertToFishInfos(Cursor csr) {
@@ -83,5 +122,4 @@ public class DbHandler {
         }
         return fishInfos;
     }
-
 }
