@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Vector;
+
 public final class Util {
 
     public static void toastMsg(Context activity, String msg) {
@@ -35,6 +37,15 @@ public final class Util {
 
         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         imageView.setImageBitmap(image);
+    }
+
+    public static void createFishTypeList (Spinner spinner, Context context) {
+        DbHandler dbHandler = DbHandler.getInstance(context);
+        Vector<String> fishTypes = dbHandler.selectFromFishTypes();
+        fishTypes.add("물고기 종류를 선택해주세요");
+        String[] items = new String[fishTypes.size()];
+        fishTypes.toArray(items);
+        Util.adaptSpinner(items, spinner, context);
     }
 
     public static void adaptSpinner (String[] items, Spinner spinner, Context context) {

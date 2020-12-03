@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -99,9 +101,8 @@ public class PreViewActivity extends Activity {
     }
 
     private void initialize() {
-        String[] items = getResources().getStringArray(R.array.FishTypes);
-        Util.adaptSpinner(items, m_spnFishTypes, this);
         m_localDbHandler =  DbHandler.getInstance(this);
+        Util.createFishTypeList(m_spnFishTypes, this);
         m_intent = getIntent();
         m_progressDialog = new ProgressDialog(this);
     }
