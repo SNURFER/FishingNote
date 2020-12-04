@@ -41,6 +41,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="locked"
             android:exported="true" />
+        <activity android:name=".OptionActivity" />
         <activity android:name=".PreViewActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".MapActivity" />

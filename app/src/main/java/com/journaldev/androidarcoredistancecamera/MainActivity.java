@@ -54,8 +54,6 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements
         PixelCopy.OnPixelCopyFinishedListener {
-
-
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -63,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements
     private ArSceneView m_arSceneView;
     private TextView m_tvDistance;
     private Button m_btnRecord;
+    private Button m_btnOption;
 
     /*PrivateMembers*/
     private ArFragment m_arFragment;
@@ -150,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements
         m_tvDistance = findViewById(R.id.tvDistance);
         m_btnRecord = findViewById(R.id.btnRecord);
         m_btnRecord.setEnabled(false);
+        m_btnOption = findViewById(R.id.btnOption);
     }
 
     private void setListeners() {
@@ -176,6 +176,11 @@ public class MainActivity extends AppCompatActivity implements
                 e.printStackTrace();
                 Util.toastMsg(this, "saved image failed");
             }
+        });
+
+        m_btnOption.setOnClickListener(v->{
+            Intent intent = new Intent(this, OptionActivity.class);
+            startActivity(intent);
         });
     }
     private AnchorNode createAnchorNode(HitResult hitResult) {
