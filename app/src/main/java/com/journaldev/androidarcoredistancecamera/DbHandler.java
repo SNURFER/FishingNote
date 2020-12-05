@@ -93,6 +93,11 @@ public class DbHandler extends SQLiteOpenHelper {
         this.m_database.execSQL(deleteQuery);
     }
 
+    public void replaceFishType (int id, String fishType) {
+        String replaceQuery = "Update FISH_INFO SET NAME = ? WHERE id = " + id;
+        this.m_database.execSQL(replaceQuery, new String[]{fishType});
+    }
+
     public Vector<FishInfo> selectFromFishInfo(String name) {
         Cursor csr;
         String selectQuery = "SELECT * FROM FISH_INFO";
