@@ -26,7 +26,6 @@ public class ViewActivity extends Activity {
     private FishListViewAdapter m_fishListViewAdapter;
 
     private DbHandler m_localDbHandler;
-    private ViewActivity m_viewActivity = this;
     private String[] m_items;
     protected void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -130,7 +129,6 @@ public class ViewActivity extends Activity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Util.toastMsg(m_viewActivity, m_items[position] + "를(을) 선택했습니다.");
                 m_localDbHandler.replaceFishType(fishListViewItem.getM_id(), m_items[position]);
                 setFishListViewFromDb();
                 dialog.dismiss();
