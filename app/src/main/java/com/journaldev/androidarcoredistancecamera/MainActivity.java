@@ -111,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements
         ArrayList<String> targetList = new ArrayList<>();
         String[] permissions = {
                 Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
         };
 
         for (String curPermission : permissions) {
