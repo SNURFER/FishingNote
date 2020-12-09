@@ -3,7 +3,6 @@ package com.journaldev.androidarcoredistancecamera;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -27,7 +26,6 @@ public class MapActivity extends AppCompatActivity {
     private GoogleMap m_map;
     private Button m_btnGoBack;
     private DbHandler m_localDbHandler;
-    private GpsTracker m_gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +54,6 @@ public class MapActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            m_gpsTracker.removeUpdates();
             finish();
         });
     }
@@ -103,8 +100,6 @@ public class MapActivity extends AppCompatActivity {
 
     private void initialize() {
         m_localDbHandler =  DbHandler.getInstance(this);
-        m_gpsTracker = GpsTracker.getInstance(this);
-        m_gpsTracker.registerLocationUpdates();
     }
 
     //TODO : this function should be flexible to create marker by fish type
@@ -113,9 +108,8 @@ public class MapActivity extends AppCompatActivity {
         if (!fishInfos.isEmpty()) {
             for (DbHandler.FishInfo fishInfo : fishInfos) {
                 MarkerOptions newMarker = new MarkerOptions();
-//                LatLng randLocation = genPositionTemp();
-                Location curLocation = m_gpsTracker.getLocation();
-                LatLng curLatLng = new LatLng(curLocation.getLatitude(), curLocation.getLongitude());
+                LatLng curLatLng = new LatLng(GpsTracker.getInstance(this).getLatitude(),
+                        GpsTracker.getInstance(this).getLongitude());
                 newMarker.position(curLatLng);
                 newMarker.title(fishInfo.name);
                 newMarker.snippet("The length of the fish caught is : " + fishInfo.size);
