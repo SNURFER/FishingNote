@@ -90,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements
         initialize();
         getView();
         setListeners();
+
+        //test
+        double a = GpsTracker.getInstance(this).getLatitude();
+        Util.toastMsg(this, Double.toString(a));
     }
 
     private boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
@@ -111,7 +115,8 @@ public class MainActivity extends AppCompatActivity implements
         ArrayList<String> targetList = new ArrayList<>();
         String[] permissions = {
                 Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION
         };
 
         for (String curPermission : permissions) {
