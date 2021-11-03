@@ -108,8 +108,9 @@ public class MapActivity extends AppCompatActivity {
         if (!fishInfos.isEmpty()) {
             for (DbHandler.FishInfo fishInfo : fishInfos) {
                 MarkerOptions newMarker = new MarkerOptions();
-                LatLng randLocation = genPositionTemp();
-                newMarker.position(randLocation);
+                LatLng curLatLng = new LatLng(GpsTracker.getInstance(this).getLatitude(),
+                        GpsTracker.getInstance(this).getLongitude());
+                newMarker.position(curLatLng);
                 newMarker.title(fishInfo.name);
                 newMarker.snippet("The length of the fish caught is : " + fishInfo.size);
                 newMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
